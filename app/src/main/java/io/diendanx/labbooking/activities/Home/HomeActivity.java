@@ -30,7 +30,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);            return insets;
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
         });
 
         initViews();
@@ -42,6 +43,11 @@ public class HomeActivity extends AppCompatActivity {
                 if (!fragmentBackStack.isEmpty()) {
                     int lastPosition = fragmentBackStack.pop();
                     viewPager.setCurrentItem(lastPosition, true);
+                    bottomNav.setSelectedItemId(lastPosition == 0 ?
+                            R.id.nav_home :
+                            lastPosition == 1 ?
+                                    R.id.nav_chat : R.id.nav_settings
+                    );
                 } else {
                     finishAffinity();
                 }

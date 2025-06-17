@@ -5,10 +5,10 @@
         android:title="Home" />
 
     <item android:id="@+id/nav_chat"
-        android:icon="@drawable/ic_chat_white"
+        android:icon="@drawable/ic_chat_stripe"
         android:title="Chat" />
 
     <item android:id="@+id/nav_settings"
-        android:icon="@drawable/ic_settings_white"
+        android:icon="@drawable/ic_settings"
         android:title="Settings" />
 </menu>
