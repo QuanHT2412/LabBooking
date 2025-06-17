@@ -1,7 +1,12 @@
 package io.diendanx.labbooking.activities.OrderConfirmation;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,11 +16,17 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import io.diendanx.labbooking.R;
 
 public class OrderConfirmationActivity extends AppCompatActivity {
-
     private MaterialToolbar toolbar;
 
     @Override
@@ -41,11 +52,31 @@ public class OrderConfirmationActivity extends AppCompatActivity {
     private void initViews() {
         toolbar = findViewById(R.id.topAppBar);
 
+
     }
 
     private void setListeners() {
         toolbar.setNavigationOnClickListener(v -> {
 
+        });
+    }
+
+
+    public void setupTimePicker(Context context, TextInputEditText editText) {
+        final Calendar calendar = Calendar.getInstance();
+        editText.setOnClickListener(v -> {
+            new TimePickerDialog(
+                    context,
+                    (view, hourOfDay, minute) -> {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                        editText.setText(timeFormat.format(calendar.getTime()));
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true)
+                    .show();
         });
     }
 }

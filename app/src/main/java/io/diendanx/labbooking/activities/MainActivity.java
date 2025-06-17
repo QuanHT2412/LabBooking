@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 
 import io.diendanx.labbooking.R;
+import io.diendanx.labbooking.activities.CartConfirm.CartConfirmActivity;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
 import io.diendanx.labbooking.activities.OrderConfirmation.OrderConfirmationActivity;
 import io.diendanx.labbooking.activities.SignIn.SignInActivity;
@@ -39,6 +40,6 @@ public class MainActivity extends AppCompatActivity {
 //            finish();
 //        }
 
-        startActivity(new Intent(this, OrderConfirmationActivity.class));
+        startActivity(new Intent(this, CartConfirmActivity.class));
     }
 }
