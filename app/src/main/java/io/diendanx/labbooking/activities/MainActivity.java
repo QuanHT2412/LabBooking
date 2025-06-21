@@ -15,6 +15,7 @@ import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.CartConfirm.CartConfirmActivity;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
 import io.diendanx.labbooking.activities.OrderConfirmation.OrderConfirmationActivity;
+import io.diendanx.labbooking.activities.Register.RegisterActivity;
 import io.diendanx.labbooking.activities.SignIn.SignInActivity;
 
 public class MainActivity extends AppCompatActivity {
