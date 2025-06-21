@@ -10,6 +10,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.CartConfirm.CartConfirmActivity;
@@ -17,10 +22,12 @@ import io.diendanx.labbooking.activities.Home.HomeActivity;
 import io.diendanx.labbooking.activities.OrderConfirmation.OrderConfirmationActivity;
 import io.diendanx.labbooking.activities.Register.RegisterActivity;
 import io.diendanx.labbooking.activities.SignIn.SignInActivity;
+import io.diendanx.labbooking.models.Package;
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore firebaseFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
