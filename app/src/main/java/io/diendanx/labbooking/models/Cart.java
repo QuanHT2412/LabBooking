@@ -7,7 +7,9 @@ import java.util.List;
 public class Cart {
     private String id;
     private String userId;
-    private String packageId; // or DocumentReference if you prefer
+    private String packageId;
+    private String packageName;
+    private double packagePrice;
     private int duration;
     private Timestamp startDate;
     private List<Facility> selectedFacilities;

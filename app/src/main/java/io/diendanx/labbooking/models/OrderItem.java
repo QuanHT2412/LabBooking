@@ -11,8 +11,20 @@ public class OrderItem {
     private int duration;
     private Timestamp startDate;
     private List<Facility> facilities;
-
     private String orderId;
+
+    public OrderItem() {
+    }
+
+    public OrderItem(String packageId, String packageName, double packagePrice, int duration, Timestamp startDate, List<Facility> facilities, String orderId) {
+        this.packageId = packageId;
+        this.packageName = packageName;
+        this.packagePrice = packagePrice;
+        this.duration = duration;
+        this.startDate = startDate;
+        this.facilities = facilities;
+        this.orderId = orderId;
+    }
 
     public String getPackageId() {
         return packageId;

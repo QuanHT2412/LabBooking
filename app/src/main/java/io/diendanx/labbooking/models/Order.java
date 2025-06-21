@@ -8,6 +8,16 @@ public class Order {
     private double totalPrice;
     private Timestamp created_at;
 
+    public Order() {
+    }
+
+    public Order(String id, String userId, double totalPrice, Timestamp created_at) {
+        this.id = id;
+        this.userId = userId;
+        this.totalPrice = totalPrice;
+        this.created_at = created_at;
+    }
+
     public String getUserId() {
         return userId;
     }
