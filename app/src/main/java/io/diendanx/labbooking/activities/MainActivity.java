@@ -12,17 +12,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import io.diendanx.labbooking.R;
-import io.diendanx.labbooking.activities.CartConfirm.CartConfirmActivity;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
-import io.diendanx.labbooking.activities.OrderConfirmation.OrderConfirmationActivity;
-import io.diendanx.labbooking.activities.Register.RegisterActivity;
-import io.diendanx.labbooking.activities.SignIn.SignInActivity;
-import io.diendanx.labbooking.models.Package;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +39,6 @@ public class MainActivity extends AppCompatActivity {
 //            finish();
 //        }
 
-        startActivity(new Intent(this, CartConfirmActivity.class));
+        startActivity(new Intent(this, HomeActivity.class));
     }
 }
