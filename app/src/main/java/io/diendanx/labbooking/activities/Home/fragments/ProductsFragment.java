@@ -1,66 +1,101 @@
 package io.diendanx.labbooking.activities.Home.fragments;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.diendanx.labbooking.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProductsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProductsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecyclerView rvProducts;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ProductsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProductsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProductsFragment newInstance(String param1, String param2) {
-        ProductsFragment fragment = new ProductsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_products, container, false);
+        rvProducts = view.findViewById(R.id.rv_products);
+        setupRecyclerView();
+        return view;
+    }
+
+    private void setupRecyclerView() {
+        rvProducts.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvProducts.setAdapter(new ProductAdapter(getSampleProducts()));
+    }
+
+    // Placeholder model
+    static class Product {
+        String name;
+        String description;
+        String price;
+
+        Product(String name, String description, String price) {
+            this.name = name;
+            this.description = description;
+            this.price = price;
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_products, container, false);
+    // Placeholder data
+    private List<Product> getSampleProducts() {
+        List<Product> products = new ArrayList<>();
+        products.add(new Product("Pack 1", "Set of 3 chairs and 1 table", "6.000.000 VND"));
+        products.add(new Product("Pack 2", "Set of 4 table and 1 chair", "12.000.000 VND"));
+        products.add(new Product("Pack 3", "Set of 1 chair on top of 1 table", "1.000.000 VND"));
+        return products;
+    }
+
+    // Minimal adapter for demonstration
+    class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
+        private final List<Product> products;
+
+        ProductAdapter(List<Product> products) {
+            this.products = products;
+        }
+
+        @NonNull
+        @Override
+        public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_product, parent, false);
+            return new ProductViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
+            Product p = products.get(position);
+            holder.tvName.setText(p.name);
+            holder.tvDescription.setText(p.description);
+            holder.tvPrice.setText(p.price);
+        }
+
+        @Override
+        public int getItemCount() {
+            return products.size();
+        }
+
+        class ProductViewHolder extends RecyclerView.ViewHolder {
+            TextView tvName, tvDescription, tvPrice;
+
+            ProductViewHolder(@NonNull View itemView) {
+                super(itemView);
+                tvName = itemView.findViewById(R.id.tv_product_name);
+                tvDescription = itemView.findViewById(R.id.tv_product_description);
+                tvPrice = itemView.findViewById(R.id.tv_product_price);
+            }
+        }
     }
 }

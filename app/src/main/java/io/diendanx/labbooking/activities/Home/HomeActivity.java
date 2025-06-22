@@ -180,10 +180,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateCartBadge() {
-        // get number of items in cart from db
+        
         int count = countCartItems();
 
-        // update the badge on the cart icon
+        
         if (count > 0) {
             tvCartBadge.setVisibility(View.VISIBLE);
             tvCartBadge.setText(String.valueOf(count));
