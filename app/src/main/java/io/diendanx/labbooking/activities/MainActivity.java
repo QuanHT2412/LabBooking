@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
+import io.diendanx.labbooking.activities.LabMap.LabMapActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +40,6 @@ public class MainActivity extends AppCompatActivity {
 //            finish();
 //        }
 
-        startActivity(new Intent(this, HomeActivity.class));
+        startActivity(new Intent(this, LabMapActivity.class));
     }
 }
