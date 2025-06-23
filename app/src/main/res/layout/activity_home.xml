@@ -38,6 +38,7 @@
             app:titleCentered="true"
             android:background="@color/main_900"
             app:menu="@menu/top_app_bar_menu"
+            app:titleTextAppearance="@style/OrderConfirmationToolbarTitle"
             app:title="Lab Booking"
             app:titleTextColor="@color/main_50" />
 
