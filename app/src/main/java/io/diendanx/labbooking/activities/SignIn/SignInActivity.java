@@ -10,12 +10,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+
 import io.diendanx.labbooking.R;
+import io.diendanx.labbooking.activities.Home.HomeActivity;
 import io.diendanx.labbooking.activities.Register.RegisterActivity;
 
 public class SignInActivity extends AppCompatActivity {
 
     private Button signInButton, registerButton;
+    private TextInputEditText emailEditText, passwordEditText;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +40,31 @@ public class SignInActivity extends AppCompatActivity {
     private void initViews() {
         signInButton = findViewById(R.id.btn_signin);
         registerButton = findViewById(R.id.btn_signup);
+        emailEditText = findViewById(R.id.et_email);
+        passwordEditText = findViewById(R.id.et_password);
+        mAuth = FirebaseAuth.getInstance();
     }
 
     private void setListeners() {
         signInButton.setOnClickListener(v -> {
-            // Handle sign-in logic
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                // Show error message
+                return;
+            }
+
+            // Handle sign-in logic here, e.g., using FirebaseAuth
+             mAuth.signInWithEmailAndPassword(email, password)
+                     .addOnCompleteListener(task -> {
+                         if (task.isSuccessful()) {
+                             startActivity(new Intent(SignInActivity.this, HomeActivity.class));
+                             finish();
+                         } else {
+                             // Show error message
+                         }
+                     });
         });
 
         registerButton.setOnClickListener(v -> {

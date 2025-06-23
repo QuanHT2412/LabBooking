@@ -10,16 +10,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import io.diendanx.labbooking.R;
-import io.diendanx.labbooking.activities.Home.HomeActivity;
-import io.diendanx.labbooking.activities.OrderConfirmation.OrderConfirmationActivity;
-import io.diendanx.labbooking.activities.Register.RegisterActivity;
 import io.diendanx.labbooking.activities.SignIn.SignInActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore firebaseFirestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +33,12 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-//        if (mAuth.getCurrentUser() == null) {
-//            // Handle case where no user is signed in
-//            startActivity(new Intent(MainActivity.this, SignInActivity.class));
-//            finish();
-//        }
+        if (mAuth.getCurrentUser() == null) {
+            // Handle case where no user is signed in
+            startActivity(new Intent(MainActivity.this, SignInActivity.class));
+            finish();
+        }
 
-        startActivity(new Intent(this, SignInActivity.class));
+//        startActivity(new Intent(this, CartConfirmActivity.class));
     }
 }
