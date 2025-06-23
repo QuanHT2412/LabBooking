@@ -1,8 +1,11 @@
 package io.diendanx.labbooking.activities.SignIn;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -29,6 +32,7 @@ public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private TextInputLayout emailInputLayout, passwordInputLayout;
     private CircularProgressIndicator progressIndicator;
+    private View rootView;
 
     @Override
     protected void onStart() {
@@ -62,6 +66,7 @@ public class SignInActivity extends AppCompatActivity {
         emailInputLayout = findViewById(R.id.et_email_wrapper_signin);
         passwordInputLayout = findViewById(R.id.et_password_wrapper_signin);
         progressIndicator = findViewById(R.id.progress_indicator_signin);
+        rootView = findViewById(R.id.main);
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -70,8 +75,8 @@ public class SignInActivity extends AppCompatActivity {
         // Validate email and password inputs
         emailEditText.setOnFocusChangeListener(this::emailValidate);
         passwordEditText.setOnFocusChangeListener(this::passwordValidate);
-
         signInButton.setOnClickListener(this::onSignInButtonClick);
+        rootView.setOnTouchListener(this::onRootViewTouch);
 
         registerButton.setOnClickListener(v -> {
             startActivity(new Intent(SignInActivity.this, RegisterActivity.class));
@@ -158,5 +163,17 @@ public class SignInActivity extends AppCompatActivity {
                 passwordInputLayout.setError(null);
             }
         }
+    }
+
+    private boolean onRootViewTouch(View v, MotionEvent event) {
+        View currentFocus = getCurrentFocus();
+        if (currentFocus != null) {
+            currentFocus.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+            }
+        }
+        return false;
     }
 }

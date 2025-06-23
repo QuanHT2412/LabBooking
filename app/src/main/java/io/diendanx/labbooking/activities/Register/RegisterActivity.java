@@ -1,12 +1,18 @@
 package io.diendanx.labbooking.activities.Register;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -28,6 +34,7 @@ import io.diendanx.labbooking.activities.SignIn.SignInActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    View rootView;
     private MaterialToolbar toolbar;
     private Button registerButton;
     private TextInputEditText emailEditText, passwordEditText, confirmPasswordEditText, nameEditText;
@@ -77,6 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordInputLayout = findViewById(R.id.et_confirm_password_wrapper);
         nameInputLayout = findViewById(R.id.et_name_wrapper);
         progressIndicator = findViewById(R.id.progress_indicator_register);
+        rootView = findViewById(R.id.nested_scroll_view);
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -92,6 +100,9 @@ public class RegisterActivity extends AppCompatActivity {
         passwordEditText.setOnFocusChangeListener(this::passwordValidate);
         confirmPasswordEditText.setOnFocusChangeListener(this::confirmPasswordValidate);
         nameEditText.setOnFocusChangeListener(this::nameValidate);
+
+        rootView.setOnTouchListener(this::onRootViewTouch);
+
     }
 
     private void onBtnRegisterClick(View view) {
@@ -221,5 +232,17 @@ public class RegisterActivity extends AppCompatActivity {
                 nameInputLayout.setError(null);
             }
         }
+    }
+
+    private boolean onRootViewTouch(View view, MotionEvent event) {
+        View currentFocus = getCurrentFocus();
+        if (currentFocus != null) {
+            currentFocus.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+            }
+        }
+        return false;
     }
 }
