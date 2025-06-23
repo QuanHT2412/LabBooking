@@ -21,9 +21,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-import io.diendanx.labbooking.Helpers.PasswordValidateUtils;
+import io.diendanx.labbooking.Helpers.ValidatorsUtils;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
+import io.diendanx.labbooking.activities.SignIn.SignInActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -128,21 +129,12 @@ public class RegisterActivity extends AppCompatActivity {
                         startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
                     } else {
                         setProgress(false);
-                        // Handle registration failure, e.g., show error message
-                        // You can use task.getException() to get the error message
-                        String errorMessage = task.getException() != null ? task.getException().getMessage() : "Registration failed";
 
-                        // Clear input fields
                         clearInputFields();
 
+                        Toast.makeText(RegisterActivity.this, "Register failed: ",
+                                Toast.LENGTH_SHORT).show();
                     }
-                })
-                .addOnFailureListener(e -> {
-                    // Handle failure, e.g., show error message
-                    setProgress(false);
-                    String errorMessage = e.getMessage() != null ? e.getMessage() : "Registration failed";
-                    // Show error message to the user
-                    Snackbar.make(findViewById(R.id.main), errorMessage, Snackbar.LENGTH_LONG).show();
                 });
     }
 
@@ -172,7 +164,7 @@ public class RegisterActivity extends AppCompatActivity {
             String email = emailEditText.getText().toString().trim();
             if (email.isEmpty()) {
                 emailInputLayout.setError("Email cannot be empty");
-            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            } else if (!ValidatorsUtils.isValidEmail(email)) {
                 emailInputLayout.setError("Invalid email format");
             } else {
                 emailInputLayout.setError(null);
@@ -185,7 +177,7 @@ public class RegisterActivity extends AppCompatActivity {
             String password = passwordEditText.getText().toString().trim();
             if (password.isEmpty()) {
                 passwordInputLayout.setError("Password cannot be empty");
-            } else if (!PasswordValidateUtils.isValidPassword(password)) {
+            } else if (!ValidatorsUtils.isValidPassword(password)) {
                 String error = "Password must:\n• Be 6–20 characters long\n• Contain uppercase letter\n• Contain lowercase letter\n• Contain number";
                 passwordInputLayout.setError(error);
             } else {

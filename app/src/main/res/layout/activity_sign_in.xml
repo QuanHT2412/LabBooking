@@ -84,6 +84,19 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!--Progress Indicator-->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress_indicator_signin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:indicatorColor="@color/main_900"
+        android:visibility="gone"
+        android:indeterminate="true"
+        app:layout_constraintStart_toStartOf="@id/btn_signin"
+        app:layout_constraintEnd_toEndOf="@id/btn_signin"
+        app:layout_constraintTop_toTopOf="@id/btn_signin"
+        app:layout_constraintBottom_toBottomOf="@id/btn_signin"/>
+
     <Button
         android:id="@+id/btn_signin"
         style="@style/Widget.MaterialComponents.Button"
