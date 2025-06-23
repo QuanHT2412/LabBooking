@@ -42,6 +42,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        startActivity(new Intent(this, LabMapActivity.class));
+        startActivity(new Intent(this, HomeActivity.class));
     }
 }
