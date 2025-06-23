@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
+import io.diendanx.labbooking.activities.SignIn.SignInActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,11 +34,11 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-//        if (mAuth.getCurrentUser() == null) {
-//            // Handle case where no user is signed in
-//            startActivity(new Intent(MainActivity.this, SignInActivity.class));
-//            finish();
-//        }
+        if (mAuth.getCurrentUser() == null) {
+            // Handle case where no user is signed in
+            startActivity(new Intent(MainActivity.this, SignInActivity.class));
+            finish();
+        }
 
         startActivity(new Intent(this, HomeActivity.class));
     }
