@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -19,12 +20,15 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Stack;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Cart.CartActivity;
 import io.diendanx.labbooking.activities.Home.adapters.HomePagerAdapter;
+import io.diendanx.labbooking.activities.SignIn.SignInActivity;
 import io.diendanx.labbooking.services.CartNotificationService;
 
 public class HomeActivity extends AppCompatActivity {
@@ -36,6 +40,18 @@ public class HomeActivity extends AppCompatActivity {
     private final Stack<Integer> fragmentBackStack = new Stack<>();
     private final int REQUEST_NOTIFICATION_PERMISSION = 100;
     private int cartItemCount = 0;
+    private Button btnSignOut;
+    private FirebaseAuth mAuth;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is already signed in
+        if (mAuth.getCurrentUser() == null) {
+            startActivity(new Intent(getApplicationContext(), SignInActivity.class));
+            finish();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottom_navigation);
         topAppBar = findViewById(R.id.top_app_bar);
         tvCartBadge = findViewById(R.id.tv_cart_badge);
+        mAuth = FirebaseAuth.getInstance();
 
         // set adapter for viewPager
         viewPager.setAdapter(new HomePagerAdapter(this));
@@ -75,6 +92,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
+
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             int newPosition = -1;

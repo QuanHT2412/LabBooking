@@ -36,6 +36,16 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout emailInputLayout, passwordInputLayout, confirmPasswordInputLayout, nameInputLayout;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is already signed in
+        if (mAuth.getCurrentUser() != null) {
+            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+            finish();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);

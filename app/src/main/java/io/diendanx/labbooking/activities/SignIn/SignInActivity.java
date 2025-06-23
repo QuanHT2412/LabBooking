@@ -31,6 +31,16 @@ public class SignInActivity extends AppCompatActivity {
     private CircularProgressIndicator progressIndicator;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is already signed in
+        if (mAuth.getCurrentUser() != null) {
+            startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+            finish();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -47,10 +57,10 @@ public class SignInActivity extends AppCompatActivity {
     private void initViews() {
         signInButton = findViewById(R.id.btn_signin);
         registerButton = findViewById(R.id.btn_signup);
-        emailEditText = findViewById(R.id.et_email);
-        passwordEditText = findViewById(R.id.et_password);
-        emailInputLayout = findViewById(R.id.et_email_wrapper);
-        passwordInputLayout = findViewById(R.id.et_confirm_password_wrapper);
+        emailEditText = findViewById(R.id.et_email_signin);
+        passwordEditText = findViewById(R.id.et_password_signin);
+        emailInputLayout = findViewById(R.id.et_email_wrapper_signin);
+        passwordInputLayout = findViewById(R.id.et_password_wrapper_signin);
         progressIndicator = findViewById(R.id.progress_indicator_signin);
         mAuth = FirebaseAuth.getInstance();
     }

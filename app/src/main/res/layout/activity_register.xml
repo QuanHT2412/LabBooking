@@ -70,6 +70,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
+                app:errorTextColor="@color/red_500"
+                app:boxStrokeErrorColor="@color/red_500"
+                app:errorIconTint="@color/red_500"
                 android:layout_marginTop="40dp"
                 android:hint="Full Name"
                 app:boxCornerRadiusBottomEnd="10dp"
@@ -83,6 +86,7 @@
                     android:id="@+id/et_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/main_900"
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -92,6 +96,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
+                app:errorTextColor="@color/red_500"
+                app:boxStrokeErrorColor="@color/red_500"
+                app:errorIconTint="@color/red_500"
                 android:layout_marginTop="12dp"
                 android:hint="@string/email"
                 app:boxCornerRadiusBottomEnd="10dp"
@@ -106,6 +113,7 @@
                     android:id="@+id/et_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/main_900"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -115,6 +123,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
+                app:errorTextColor="@color/red_500"
+                app:boxStrokeErrorColor="@color/red_500"
+                app:errorIconTint="@color/red_500"
                 android:layout_marginTop="12dp"
                 android:hint="@string/password"
                 app:boxCornerRadiusBottomEnd="10dp"
@@ -129,6 +140,7 @@
                     android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/main_900"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -138,6 +150,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
+                app:errorTextColor="@color/red_500"
+                app:boxStrokeErrorColor="@color/red_500"
+                app:errorIconTint="@color/red_500"
                 android:layout_marginTop="12dp"
                 android:hint="Confirm Password"
                 app:boxCornerRadiusBottomEnd="10dp"
@@ -152,6 +167,7 @@
                     android:id="@+id/et_confirm_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/main_900"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -176,7 +192,8 @@
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginTop="30dp"
                 android:backgroundTint="@color/main_900"
-                android:padding="12dp"
+                android:textColor="@color/main_50"
+                android:padding="18dp"
                 android:text="Register"
                 app:cornerRadius="10dp"
                 app:layout_constraintStart_toStartOf="parent"
