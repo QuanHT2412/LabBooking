@@ -1,7 +1,12 @@
 package io.diendanx.labbooking.activities.OrderConfirmation;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +20,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 import io.diendanx.labbooking.R;
 
 public class OrderConfirmationActivity extends AppCompatActivity {
-
     private MaterialToolbar toolbar;
 
     @Override
@@ -41,6 +45,7 @@ public class OrderConfirmationActivity extends AppCompatActivity {
     private void initViews() {
         toolbar = findViewById(R.id.topAppBar);
 
+
     }
 
     private void setListeners() {
@@ -48,4 +53,5 @@ public class OrderConfirmationActivity extends AppCompatActivity {
 
         });
     }
+
 }
