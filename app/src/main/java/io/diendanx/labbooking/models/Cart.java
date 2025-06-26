@@ -11,11 +11,11 @@ public class Cart {
 
     private int duration;
     private Timestamp startDate;
-    private List<Facility> selectedFacilities;
+    private List<String> selectedFacilities;
 
     public Cart() {}
 
-    public Cart(String userId, String packageId, int duration, Timestamp startDate, List<Facility> selectedFacilities) {
+    public Cart(String userId, String packageId, int duration, Timestamp startDate, List<String> selectedFacilities) {
         this.userId = userId;
         this.packageId = packageId;
         this.duration = duration;
@@ -56,11 +56,11 @@ public class Cart {
         this.startDate = startDate;
     }
 
-    public List<Facility> getSelectedFacilities() {
+    public List<String> getSelectedFacilities() {
         return selectedFacilities;
     }
 
-    public void setSelectedFacilities(List<Facility> selectedFacilities) {
+    public void setSelectedFacilities(List<String> selectedFacilities) {
         this.selectedFacilities = selectedFacilities;
     }
 

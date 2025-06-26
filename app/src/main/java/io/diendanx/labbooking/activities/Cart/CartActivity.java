@@ -3,6 +3,7 @@ package io.diendanx.labbooking.activities.Cart;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,9 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +21,16 @@ import java.util.List;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Cart.adapters.CartAdapter;
 import io.diendanx.labbooking.models.Cart;
+import io.diendanx.labbooking.models.Facility;
 import io.diendanx.labbooking.models.Package;
+import io.diendanx.labbooking.repository.CartRepository;
+import io.diendanx.labbooking.repository.FacilityRepository;
+import io.diendanx.labbooking.repository.PackageRepository;
 
 public class CartActivity extends AppCompatActivity {
 
     private List<Package> packages;
+    private List<Facility> facilities;
     private CartAdapter adapter;
 
     private RecyclerView recyclerView;
@@ -35,8 +38,10 @@ public class CartActivity extends AppCompatActivity {
     private LinearLayout emptyStateLayout;
     private MaterialButton btnProceedOrder;
 
-    private FirebaseFirestore db;
-    private FirebaseAuth mAuth;
+
+    private CartRepository cartRepository;
+    private PackageRepository packageRepository;
+    private FacilityRepository facilityRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +55,18 @@ public class CartActivity extends AppCompatActivity {
         });
         setupToolbar();
         recyclerView = findViewById(R.id.recyclerViewCartItems);
+        recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         btnProceedOrder = findViewById(R.id.btnProceedOrder);
-        db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
         cartList = new ArrayList<>();
         packages = new ArrayList<>();
-        adapter = new CartAdapter(cartList, packages, this, position -> removeCartItem(position));
+        facilities = new ArrayList<>();
+        adapter = new CartAdapter(cartList, packages, facilities, position -> removeCartItem(position));
         recyclerView.setAdapter(adapter);
-        loadPackagesAndCart();
+        cartRepository = new CartRepository();
+        packageRepository = new PackageRepository();
+        facilityRepository = new FacilityRepository();
+        loadFacilitiesAndThenPackagesAndCart();
         btnProceedOrder.setOnClickListener(v -> proceedOrder());
     }
 
@@ -88,13 +96,19 @@ public class CartActivity extends AppCompatActivity {
         long total = 0;
         if (cartList != null && packages != null) {
             for (Cart cart : cartList) {
-                Package pkg = findPackageById(cart.getPackageId());
+                Package pkg = null;
+                for (Package p : packages) {
+                    if (p.getId().equals(cart.getPackageId())) {
+                        pkg = p;
+                        break;
+                    }
+                }
                 if (pkg != null) {
                     total += pkg.getPrice();
                 }
             }
         }
-        btnProceedOrder.setText(String.format("Proceed (%,.0fđ)", (float) total));
+        btnProceedOrder.setText(String.format("\uD83C\uDFC1 PROCEED ORDER (%,.0fđ)", (float) total));
     }
 
     private void removeCartItem(int position) {
@@ -110,49 +124,74 @@ public class CartActivity extends AppCompatActivity {
         // TODO: Implement order proceeding logic
     }
 
-    public void setPackages(List<Package> packages) {
-        this.packages = packages;
-    }
 
-    public Package findPackageById(String id) {
-        if (packages == null) return null;
-        for (Package p : packages) {
-            if (p.getId().equals(id)) {
-                return p;
+    private void loadFacilitiesAndThenPackagesAndCart() {
+        facilityRepository.getAll(new FacilityRepository.ListCallback<Facility>() {
+            @Override
+            public void onSuccess(List<Facility> items) {
+                facilities.clear();
+                facilities.addAll(items);
+                loadPackagesAndCart();
             }
-        }
-        return null;
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(CartActivity.this, "Failed to load facilities", Toast.LENGTH_SHORT).show();
+                loadPackagesAndCart(); // fallback: still try to load cart
+            }
+        });
     }
 
     private void loadPackagesAndCart() {
-        db.collection("package").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+        packageRepository.getAll(new PackageRepository.ListCallback<Package>() {
+            @Override
+            public void onSuccess(List<Package> items) {
                 packages.clear();
-                for (QueryDocumentSnapshot doc : task.getResult()) {
-                    Package pkg = doc.toObject(Package.class);
-                    pkg.setId(doc.getId()); // Ensure ID is set
-                    packages.add(pkg);
-                }
+                packages.addAll(items);
                 loadCart();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(CartActivity.this, "Failed to load packages", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void loadCart() {
-        String uid = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;
-        if (uid == null) return;
-        db.collection("cart").document(uid).collection("items").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+        cartRepository.getAll(new CartRepository.ListCallback<Cart>() {
+            @Override
+            public void onSuccess(List<Cart> items) {
                 cartList.clear();
-                for (QueryDocumentSnapshot doc : task.getResult()) {
-                    Cart cart = doc.toObject(Cart.class);
-                    cartList.add(cart);
+                String currentUserId = getCurrentUserId();
+                if (currentUserId != null) {
+                    for (Cart cart : items) {
+                        if (currentUserId.equals(cart.getUserId())) {
+                            cartList.add(cart);
+                        }
+                    }
+                } else {
+                    cartList.addAll(items);
                 }
                 adapter.notifyDataSetChanged();
                 updateEmptyState();
                 updateProceedButtonText();
             }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(CartActivity.this, "Failed to load carts", Toast.LENGTH_SHORT).show();
+            }
         });
+    }
+
+    private String getCurrentUserId() {
+        try {
+            com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+            if (auth.getCurrentUser() != null) {
+                return auth.getCurrentUser().getUid();
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 
 }
