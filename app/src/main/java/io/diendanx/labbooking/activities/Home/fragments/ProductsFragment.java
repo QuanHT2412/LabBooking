@@ -145,7 +145,7 @@ public class ProductsFragment extends Fragment {
     private void setupRecyclerView() {
         if (rvProducts == null) return;
 
-        rvProducts.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvProducts.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         adapter = new ProductAdapter(displayedPackages);
         rvProducts.setAdapter(adapter);
     }
