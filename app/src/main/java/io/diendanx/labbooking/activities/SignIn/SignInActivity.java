@@ -12,20 +12,29 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import io.diendanx.labbooking.Helpers.ValidatorsUtils;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
+import io.diendanx.labbooking.activities.MainActivity;
 import io.diendanx.labbooking.activities.Register.RegisterActivity;
+import io.diendanx.labbooking.models.Cart;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -58,6 +67,35 @@ public class SignInActivity extends AppCompatActivity {
         });
         initViews();
         setListeners();
+
+        FirebaseFirestore.getInstance().collection("cart")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            var cartId = document.getId();
+
+                            CollectionReference facilityCollection = document.getReference().collection("facility");
+
+                            facilityCollection.get().addOnCompleteListener(facilityTask -> {
+                                if (facilityTask.isSuccessful()) {
+                                    for (QueryDocumentSnapshot facilityDoc : facilityTask.getResult()) {
+                                        String facilityId = facilityDoc.getId();
+                                        // Process each facility document as needed
+                                        Toast.makeText(SignInActivity.this, "Facility ID: " + facilityId, Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(SignInActivity.this, "Failed to load facilities.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+//                            var cartItem = document.toObject(Cart.class);
+//                            Toast.makeText(SignInActivity.this, "Cart item loaded: " + cartItem.getId(), Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(SignInActivity.this, "Failed to load cart items.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void initViews() {
