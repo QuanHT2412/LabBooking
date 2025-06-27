@@ -3,6 +3,8 @@ package io.diendanx.labbooking.activities.SignIn;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -72,9 +74,24 @@ public class SignInActivity extends AppCompatActivity {
 
     private void setListeners() {
 
-        // Validate email and password inputs
-        emailEditText.setOnFocusChangeListener(this::emailValidate);
-        passwordEditText.setOnFocusChangeListener(this::passwordValidate);
+        ValidatorsUtils.setUpTextWatcher(emailEditText, emailInputLayout, input -> {
+            if (input.isEmpty()) {
+                return "Email cannot be empty";
+            } else if (!ValidatorsUtils.isValidEmail(input)) {
+                return "Invalid email format";
+            }
+            return null; // No error
+        });
+
+        ValidatorsUtils.setUpTextWatcher(passwordEditText, passwordInputLayout, input -> {
+            if (input.isEmpty()) {
+                return "Password cannot be empty";
+            } else if (!ValidatorsUtils.isValidPassword(input)) {
+                return "Password must:\n• Be 6-20 characters long\n• Contain uppercase letter\n• Contain lowercase letter\n• Contain number";
+            }
+            return null; // No error
+        });
+
         signInButton.setOnClickListener(this::onSignInButtonClick);
         rootView.setOnTouchListener(this::onRootViewTouch);
 
@@ -85,6 +102,9 @@ public class SignInActivity extends AppCompatActivity {
 
     private void onSignInButtonClick(View v) {
 
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+
         // Check if fields are validated before proceeding
         if (emailInputLayout.getError() != null ||
                 passwordInputLayout.getError() != null) {
@@ -92,9 +112,6 @@ public class SignInActivity extends AppCompatActivity {
         }
 
         setProgress(true);
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
-
         // Check if any field is empty and show error if so
         if (email.isEmpty() || password.isEmpty()) {
             setProgress(false);
@@ -115,7 +132,7 @@ public class SignInActivity extends AppCompatActivity {
                         setProgress(false);
                         clearInputFields();
 
-                        Toast.makeText(SignInActivity.this, "Sign-in failed: ",
+                        Toast.makeText(SignInActivity.this, "Sign-in failed",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -135,33 +152,6 @@ public class SignInActivity extends AppCompatActivity {
         } else {
             progressIndicator.setVisibility(View.GONE);
             signInButton.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void emailValidate(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            String email = emailEditText.getText().toString().trim();
-            if (email.isEmpty()) {
-                emailInputLayout.setError("Email cannot be empty");
-            } else if (!ValidatorsUtils.isValidEmail(email)) {
-                emailInputLayout.setError("Invalid email format");
-            } else {
-                emailInputLayout.setError(null);
-            }
-        }
-    }
-
-    private void passwordValidate(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            String password = passwordEditText.getText().toString().trim();
-            if (password.isEmpty()) {
-                passwordInputLayout.setError("Password cannot be empty");
-            } else if (!ValidatorsUtils.isValidPassword(password)) {
-                String error = "Password must:\n• Be 6–20 characters long\n• Contain uppercase letter\n• Contain lowercase letter\n• Contain number";
-                passwordInputLayout.setError(error);
-            } else {
-                passwordInputLayout.setError(null);
-            }
         }
     }
 

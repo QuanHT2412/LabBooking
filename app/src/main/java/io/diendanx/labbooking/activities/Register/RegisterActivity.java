@@ -3,6 +3,8 @@ package io.diendanx.labbooking.activities.Register;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -96,10 +98,41 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(this::onBtnRegisterClick);
 
         // Set focus change listeners to validate input fields
-        emailEditText.setOnFocusChangeListener(this::emailValidate);
-        passwordEditText.setOnFocusChangeListener(this::passwordValidate);
-        confirmPasswordEditText.setOnFocusChangeListener(this::confirmPasswordValidate);
-        nameEditText.setOnFocusChangeListener(this::nameValidate);
+        // Add these TextWatchers to validate input in real-time
+        ValidatorsUtils.setUpTextWatcher(emailEditText, emailInputLayout, input -> {
+            if (input.isEmpty()) {
+                return "Email cannot be empty";
+            } else if (!ValidatorsUtils.isValidEmail(input)) {
+                return "Invalid email format";
+            }
+            return null; // No error
+        });
+
+        ValidatorsUtils.setUpTextWatcher(passwordEditText, passwordInputLayout, input -> {
+            if (input.isEmpty()) {
+                return "Password cannot be empty";
+            } else if (!ValidatorsUtils.isValidPassword(input)) {
+                return "Password must:\n• Be 6-20 characters long\n• Contain uppercase letter\n• Contain lowercase letter\n• Contain number";
+            }
+            return null; // No error
+        });
+
+        ValidatorsUtils.setUpTextWatcher(confirmPasswordEditText, confirmPasswordInputLayout, input -> {
+            String password = passwordEditText.getText().toString().trim();
+            if (input.isEmpty()) {
+                return "Confirm password cannot be empty";
+            } else if (!input.equals(password)) {
+                return "Confirm password does not match";
+            }
+            return null; // No error
+        });
+
+        ValidatorsUtils.setUpTextWatcher(nameEditText, nameInputLayout, input -> {
+            if (input.isEmpty()) {
+                return "Name cannot be empty";
+            }
+            return null; // No error
+        });
 
         rootView.setOnTouchListener(this::onRootViewTouch);
 
@@ -177,60 +210,6 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             progressIndicator.setVisibility(View.GONE);
             registerButton.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void emailValidate(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            String email = emailEditText.getText().toString().trim();
-            if (email.isEmpty()) {
-                emailInputLayout.setError("Email cannot be empty");
-            } else if (!ValidatorsUtils.isValidEmail(email)) {
-                emailInputLayout.setError("Invalid email format");
-            } else {
-                emailInputLayout.setError(null);
-            }
-        }
-    }
-
-    private void passwordValidate(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            String password = passwordEditText.getText().toString().trim();
-            if (password.isEmpty()) {
-                passwordInputLayout.setError("Password cannot be empty");
-            } else if (!ValidatorsUtils.isValidPassword(password)) {
-                String error = "Password must:\n• Be 6–20 characters long\n• Contain uppercase letter\n• Contain lowercase letter\n• Contain number";
-                passwordInputLayout.setError(error);
-            } else {
-                passwordInputLayout.setError(null);
-            }
-        }
-    }
-
-    private void confirmPasswordValidate(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
-            String password = passwordEditText.getText().toString().trim();
-            if (confirmPassword.isEmpty()) {
-                confirmPasswordInputLayout.setError("Confirm password cannot be empty");
-            } else if (!confirmPassword.equals(password)) {
-                confirmPasswordInputLayout.setError("Confirm password does not match");
-            } else {
-                confirmPasswordInputLayout.setError(null);
-            }
-        }
-    }
-
-    private void nameValidate(View v, boolean hasFocus) {
-        if (!hasFocus) {
-            String name = nameEditText.getText().toString().trim();
-            if (name.isEmpty()) {
-                nameInputLayout.setError("Name cannot be empty");
-            } else if (name.length() < 2 || name.length() > 50) {
-                nameInputLayout.setError("Name must be between 2 and 50 characters");
-            } else {
-                nameInputLayout.setError(null);
-            }
         }
     }
 
