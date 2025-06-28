@@ -1,6 +1,7 @@
 package io.diendanx.labbooking.activities.ProductDetail;
 
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +16,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import io.diendanx.labbooking.Helpers.ImageGetterUtils;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.models.Package;
 import io.diendanx.labbooking.repository.PackageRepository;
@@ -23,6 +25,7 @@ import io.diendanx.labbooking.repository.BaseRepository;
 public class ProductDetailActivity extends AppCompatActivity {
 
     private TextView tvName, tvInfo, tvPrice, tvDescription;
+    private ImageView imagePackage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         tvInfo = findViewById(R.id.tv_package_info);
         tvPrice = findViewById(R.id.tv_package_price);
         tvDescription = findViewById(R.id.package_description_text);
+        imagePackage = findViewById(R.id.image_package);
 
         // Get package id from intent
         String packageId = getIntent().getStringExtra("package_id");
@@ -84,6 +88,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         tvPrice.setText(formatPrice(pkg.getPrice()));
         if (tvDescription != null) {
             tvDescription.setText(pkg.getDescription());
+        }
+        if (imagePackage != null) {
+            ImageGetterUtils.loadImage(this, pkg.getImageUrl(), imagePackage);
         }
     }
 

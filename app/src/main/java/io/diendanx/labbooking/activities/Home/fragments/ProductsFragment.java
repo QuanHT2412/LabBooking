@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import io.diendanx.labbooking.Helpers.ImageGetterUtils;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.ProductDetail.ProductDetailActivity;
 import io.diendanx.labbooking.models.Package;
@@ -289,6 +291,8 @@ public class ProductsFragment extends Fragment {
                 holder.tvName.setText(p.getName());
                 holder.tvDescription.setText(p.getDescription());
                 holder.tvPrice.setText(formatPrice(p.getPrice()));
+                // Load image using Glide utility
+                ImageGetterUtils.loadImage(holder.itemView.getContext(), p.getImageUrl(), holder.imageProduct);
 
                 holder.itemView.setOnClickListener(v -> {
                     try {
@@ -311,12 +315,14 @@ public class ProductsFragment extends Fragment {
 
         class ProductViewHolder extends RecyclerView.ViewHolder {
             TextView tvName, tvDescription, tvPrice;
+            ImageView imageProduct;
 
             ProductViewHolder(@NonNull View itemView) {
                 super(itemView);
                 tvName = itemView.findViewById(R.id.tv_product_name);
                 tvDescription = itemView.findViewById(R.id.tv_product_description);
                 tvPrice = itemView.findViewById(R.id.tv_product_price);
+                imageProduct = itemView.findViewById(R.id.image_product);
             }
         }
 
