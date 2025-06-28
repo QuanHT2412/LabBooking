@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -55,13 +56,13 @@ public class CartActivity extends AppCompatActivity {
         });
         setupToolbar();
         recyclerView = findViewById(R.id.recyclerViewCartItems);
-        recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         btnProceedOrder = findViewById(R.id.btnProceedOrder);
         cartList = new ArrayList<>();
         packages = new ArrayList<>();
         facilities = new ArrayList<>();
-        adapter = new CartAdapter(cartList, packages, facilities, position -> removeCartItem(position));
+        adapter = new CartAdapter(this, cartList, packages, facilities, position -> removeCartItem(position));
         recyclerView.setAdapter(adapter);
         cartRepository = new CartRepository();
         packageRepository = new PackageRepository();

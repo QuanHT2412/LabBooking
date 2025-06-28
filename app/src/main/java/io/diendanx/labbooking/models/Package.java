@@ -8,7 +8,9 @@ public class Package {
     private String description;
     private Long price;
 
-    public Package(String id, String name, int seatCount, int tableCount, String description, Long price) {
+    private String imageUrl;
+
+    public Package(String id, String name, int seatCount, int tableCount, String description, Long price, String imageUrl) {
         this.id = id;
         this.name = name;
         this.seatCount = seatCount;
@@ -65,5 +67,12 @@ public class Package {
 
     public void setPrice(Long price) {
         this.price = price;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
