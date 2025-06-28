@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -36,8 +37,8 @@ import io.diendanx.labbooking.activities.SignIn.SignInActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    View rootView;
-    private MaterialToolbar toolbar;
+    private View rootView;
+    private TextView signInTextView;
     private Button registerButton;
     private TextInputEditText emailEditText, passwordEditText, confirmPasswordEditText, nameEditText;
     private FirebaseAuth mAuth;
@@ -75,7 +76,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        toolbar = findViewById(R.id.topAppBar);
         registerButton = findViewById(R.id.btn_register);
         emailEditText = findViewById(R.id.et_email);
         passwordEditText = findViewById(R.id.et_password);
@@ -86,18 +86,16 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordInputLayout = findViewById(R.id.et_confirm_password_wrapper);
         nameInputLayout = findViewById(R.id.et_name_wrapper);
         progressIndicator = findViewById(R.id.progress_indicator_register);
-        rootView = findViewById(R.id.nested_scroll_view);
+        rootView = findViewById(R.id.main);
         mAuth = FirebaseAuth.getInstance();
+        signInTextView = findViewById(R.id.txt_sign_in);
     }
 
     private void setListeners() {
-        toolbar.setNavigationOnClickListener(v -> {
-            finish();
-        });
 
+        // Set up the on click listener for the register button
         registerButton.setOnClickListener(this::onBtnRegisterClick);
 
-        // Set focus change listeners to validate input fields
         // Add these TextWatchers to validate input in real-time
         ValidatorsUtils.setUpTextWatcher(emailEditText, emailInputLayout, input -> {
             if (input.isEmpty()) {
@@ -134,6 +132,13 @@ public class RegisterActivity extends AppCompatActivity {
             return null; // No error
         });
 
+        // Set up the sign-in text view to navigate to SignInActivity
+        signInTextView.setOnClickListener(v -> {
+            startActivity(new Intent(RegisterActivity.this, SignInActivity.class));
+            finish(); // Optional: close RegisterActivity
+        });
+
+        // Set up touch listener to hide keyboard when touching outside input fields
         rootView.setOnTouchListener(this::onRootViewTouch);
 
     }
@@ -206,7 +211,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void setProgress(boolean isLoading) {
         if (isLoading) {
             progressIndicator.setVisibility(View.VISIBLE);
-            registerButton.setVisibility(View.INVISIBLE);
+            registerButton.setVisibility(View.GONE);
         } else {
             progressIndicator.setVisibility(View.GONE);
             registerButton.setVisibility(View.VISIBLE);

@@ -1,82 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_50"
     tools:context=".activities.Register.RegisterActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/main_900"
-            android:minHeight="0dp"
-            app:navigationIcon="@drawable/ic_chevron_left"
-            app:navigationIconTint="@color/main_50"
-            app:title="Register"
-            app:titleTextAppearance="@style/OrderConfirmationToolbarTitle"
-            app:titleTextColor="@color/main_50" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nested_scroll_view"
+    <ImageView
+        android:src="@drawable/login_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:scaleType="fitXY" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/img_logo"
-                android:layout_width="221dp"
-                android:layout_height="136dp"
-                android:layout_marginTop="16dp"
-                android:foregroundGravity="center"
-                android:scaleType="centerInside"
-                android:src="@mipmap/ic_launcher"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <TextView
                 android:id="@+id/txt_lab_booking"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="124dp"
                 android:gravity="center"
                 android:paddingHorizontal="12dp"
-                android:text="Lab Booking"
+                android:text="Register"
                 android:textColor="@color/main_900"
                 android:textSize="25sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.497"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txt_welcome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:paddingHorizontal="12dp"
                 android:text="Register your account to continue"
                 android:textColor="@color/main_900"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txt_lab_booking" />
+                android:textSize="16sp" />
 
             <!--Name-->
             <com.google.android.material.textfield.TextInputLayout
@@ -87,14 +60,12 @@
                 app:errorTextColor="@color/red_500"
                 app:boxStrokeErrorColor="@color/red_500"
                 app:errorIconTint="@color/red_500"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="16dp"
                 android:hint="Full Name"
                 app:boxCornerRadiusBottomEnd="10dp"
                 app:boxCornerRadiusBottomStart="10dp"
                 app:boxCornerRadiusTopEnd="10dp"
-                app:boxCornerRadiusTopStart="10dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txt_welcome">
+                app:boxCornerRadiusTopStart="10dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_name"
@@ -119,9 +90,7 @@
                 app:boxCornerRadiusBottomStart="10dp"
                 app:boxCornerRadiusTopEnd="10dp"
                 app:boxCornerRadiusTopStart="10dp"
-                app:endIconMode="clear_text"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/et_name_wrapper">
+                app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_email"
@@ -146,9 +115,7 @@
                 app:boxCornerRadiusBottomStart="10dp"
                 app:boxCornerRadiusTopEnd="10dp"
                 app:boxCornerRadiusTopStart="10dp"
-                app:endIconMode="password_toggle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/et_email_wrapper">
+                app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_password"
@@ -173,9 +140,7 @@
                 app:boxCornerRadiusBottomStart="10dp"
                 app:boxCornerRadiusTopEnd="10dp"
                 app:boxCornerRadiusTopStart="10dp"
-                app:endIconMode="password_toggle"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/et_password_wrapper">
+                app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_confirm_password"
@@ -190,13 +155,9 @@
                 android:id="@+id/progress_indicator_register"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:indicatorColor="@color/main_900"
-                android:visibility="gone"
                 android:indeterminate="true"
-                app:layout_constraintStart_toStartOf="@id/btn_register"
-                app:layout_constraintEnd_toEndOf="@id/btn_register"
-                app:layout_constraintTop_toTopOf="@id/btn_register"
-                app:layout_constraintBottom_toBottomOf="@id/btn_register"/>
+                android:visibility="gone"
+                app:indicatorColor="@color/main_900" />
 
             <Button
                 android:id="@+id/btn_register"
@@ -204,15 +165,42 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="15dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
                 android:backgroundTint="@color/main_900"
-                android:textColor="@color/main_50"
                 android:padding="18dp"
                 android:text="Register"
-                app:cornerRadius="10dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/et_confirm_password_wrapper" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+                android:textColor="@color/main_50"
+                android:visibility="visible"
+                app:cornerRadius="10dp" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:paddingVertical="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/txt_already_have_account"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Already have an account?"
+                    android:textColor="@color/main_900"
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
+                <TextView
+                    android:id="@+id/txt_sign_in"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:text="Sign In"
+                    android:textColor="@color/main_900"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
