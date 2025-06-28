@@ -155,9 +155,9 @@
                 android:id="@+id/progress_indicator_register"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:indicatorColor="@color/main_900"
+                android:indeterminate="true"
                 android:visibility="gone"
-                android:indeterminate="true" />
+                app:indicatorColor="@color/main_900" />
 
             <Button
                 android:id="@+id/btn_register"
@@ -167,20 +167,22 @@
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/main_900"
-                android:textColor="@color/main_50"
                 android:padding="18dp"
                 android:text="Register"
+                android:textColor="@color/main_50"
+                android:visibility="visible"
                 app:cornerRadius="10dp" />
             <LinearLayout
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:layout_marginTop="10dp"
+                android:paddingVertical="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/txt_already_have_account"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="Already have an account?"
                     android:textColor="@color/main_900"
                     android:textSize="14sp"
@@ -188,7 +190,7 @@
                 <TextView
                     android:id="@+id/txt_sign_in"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="5dp"
                     android:text="Sign In"
                     android:textColor="@color/main_900"

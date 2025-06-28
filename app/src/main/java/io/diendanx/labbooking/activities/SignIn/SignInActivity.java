@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -29,7 +30,8 @@ import io.diendanx.labbooking.activities.Register.RegisterActivity;
 
 public class SignInActivity extends AppCompatActivity {
 
-    private Button signInButton, registerButton;
+    private Button signInButton;
+    private TextView registerTv;
     private TextInputEditText emailEditText, passwordEditText;
     private FirebaseAuth mAuth;
     private TextInputLayout emailInputLayout, passwordInputLayout;
@@ -62,7 +64,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private void initViews() {
         signInButton = findViewById(R.id.btn_signin);
-        registerButton = findViewById(R.id.btn_signup);
+        registerTv = findViewById(R.id.txt_sign_up);
         emailEditText = findViewById(R.id.et_email_signin);
         passwordEditText = findViewById(R.id.et_password_signin);
         emailInputLayout = findViewById(R.id.et_email_wrapper_signin);
@@ -74,6 +76,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private void setListeners() {
 
+        // Set up text watchers for validation
         ValidatorsUtils.setUpTextWatcher(emailEditText, emailInputLayout, input -> {
             if (input.isEmpty()) {
                 return "Email cannot be empty";
@@ -92,11 +95,16 @@ public class SignInActivity extends AppCompatActivity {
             return null; // No error
         });
 
+        // Set up the on click listener for the sign-in button
         signInButton.setOnClickListener(this::onSignInButtonClick);
+
+        // Set up the on touch listener for the root view to hide keyboard when touching outside input fields
         rootView.setOnTouchListener(this::onRootViewTouch);
 
-        registerButton.setOnClickListener(v -> {
+        // Set up the on click listener for the register text view
+        registerTv.setOnClickListener(v -> {
             startActivity(new Intent(SignInActivity.this, RegisterActivity.class));
+            finish();
         });
     }
 
@@ -132,7 +140,7 @@ public class SignInActivity extends AppCompatActivity {
                         setProgress(false);
                         clearInputFields();
 
-                        Toast.makeText(SignInActivity.this, "Sign-in failed",
+                        Toast.makeText(SignInActivity.this, "Email or password is incorrect",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -148,7 +156,7 @@ public class SignInActivity extends AppCompatActivity {
     private void setProgress(boolean isLoading) {
         if (isLoading) {
             progressIndicator.setVisibility(View.VISIBLE);
-            signInButton.setVisibility(View.INVISIBLE);
+            signInButton.setVisibility(View.GONE);
         } else {
             progressIndicator.setVisibility(View.GONE);
             signInButton.setVisibility(View.VISIBLE);
