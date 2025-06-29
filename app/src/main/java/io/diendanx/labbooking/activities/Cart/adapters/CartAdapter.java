@@ -1,5 +1,6 @@
 package io.diendanx.labbooking.activities.Cart.adapters;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -30,12 +32,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.PackageViewHol
     private List<Facility> facilities;
 
     private OnRemoveClickListener removeClickListener;
+    private Context context;
 
     public interface OnRemoveClickListener {
         void onRemoveClick(int position);
     }
 
-    public CartAdapter(List<Cart> cartList, List<Package> packages, List<Facility> facilities, OnRemoveClickListener removeClickListener) {
+    public CartAdapter(Context context, List<Cart> cartList, List<Package> packages, List<Facility> facilities, OnRemoveClickListener removeClickListener) {
+        this.context = context;
         this.cartList = cartList;
         this.packages = packages;
         this.facilities = facilities;
@@ -86,8 +90,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.PackageViewHol
         holder.textFacilities.setText(
             !facilityNames.isEmpty() ? TextUtils.join(", ", facilityNames) : "N/A"
         );
-        // Calculate total price
-        long totalPrice = packagePrice;
+        // Calculate total price: (package price * duration in hours) + sum of facilities
+        int durationMinutes = cart.getDuration();
+        int durationHours = (int) Math.ceil(durationMinutes / 60.0); // round up to next hour if not full hour
+        long totalPrice = packagePrice * durationHours;
         if (facilityIds != null && facilities != null && !facilities.isEmpty()) {
             for (String id : facilityIds) {
                 for (Facility f : facilities) {
@@ -112,8 +118,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.PackageViewHol
             cal.setTime(cart.getStartDate().toDate());
             int startHour = cal.get(Calendar.HOUR_OF_DAY);
             int startMinute = cal.get(Calendar.MINUTE);
-            int durationMinutes = cart.getDuration();
-            int endTotalMinutes = startHour * 60 + startMinute + durationMinutes;
+            int duration = cart.getDuration();
+            int endTotalMinutes = startHour * 60 + startMinute + duration;
             int endHour = endTotalMinutes / 60;
             int endMinute = endTotalMinutes % 60;
             String startStr = String.format("%02d:%02d", startHour, startMinute);
@@ -123,7 +129,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.PackageViewHol
             holder.textBookingTime.setText("-");
         }
         holder.buttonRemove.setOnClickListener(v -> {
-            if (removeClickListener != null) removeClickListener.onRemoveClick(position);
+            new AlertDialog.Builder(context)
+                .setTitle("Remove Item")
+                .setMessage("Are you sure you want to remove this item from the cart?")
+                .setPositiveButton("Remove", (dialog, which) -> {
+                    if (removeClickListener != null) removeClickListener.onRemoveClick(position);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
         });
     }
 
