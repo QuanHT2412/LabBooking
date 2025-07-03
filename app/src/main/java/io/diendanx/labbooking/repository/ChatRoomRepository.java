@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.Query;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,18 +57,17 @@ public class ChatRoomRepository extends BaseRepository<ChatRoom> {
         });
     }
 
-    public CollectionReference getChatRoomMessagesRef(String chatRoomId) {
-        return ref.document(chatRoomId).collection("chat_messages");
+    public Query getChatMessagesQuery(String chatRoomId, String orderByField, String orderByDirection, int limit) {
+        return ref.document(chatRoomId)
+                .collection("chat_messages")
+                .orderBy(orderByField, "asc".equals(orderByDirection) ? Query.Direction.ASCENDING : Query.Direction.DESCENDING)
+                .limit(limit);
     }
 
     public void sendMessage(String chatRoomId, ChatMessage msg, ItemCallback<Void> callback) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("message", msg.getMessage());
-        data.put("senderId", msg.getSenderId());
-        data.put("timestamp", FieldValue.serverTimestamp());
 
         ref.document(chatRoomId).collection("chat_messages")
-                .add(data)
+                .add(msg)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         callback.onSuccess(null);

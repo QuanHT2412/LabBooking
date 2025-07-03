@@ -1,19 +1,20 @@
 package io.diendanx.labbooking.models;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.ServerTimestamp;
 
 public class ChatMessage {
     private String message;
     private String senderId;
+    @ServerTimestamp
     private Timestamp timestamp;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(String message, String senderId, Timestamp timestamp) {
+    public ChatMessage(String message, String senderId) {
         this.message = message;
         this.senderId = senderId;
-        this.timestamp = timestamp;
     }
 
     public String getMessage() {

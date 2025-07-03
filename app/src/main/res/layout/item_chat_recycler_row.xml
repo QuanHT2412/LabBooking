@@ -11,7 +11,10 @@
         android:layout_height="wrap_content"
         android:text="Time"
         android:visibility="gone"
+        android:alpha="0"
         android:textColor="@color/gray_500"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -31,7 +34,7 @@
             android:background="@drawable/background_received_message"
             android:padding="12dp"
             android:text="Hello"
-            android:maxWidth="200dp"
+            android:maxWidth="250dp"
             android:textColor="@color/white"
             android:textSize="14dp" />
     </LinearLayout>
@@ -50,19 +53,11 @@
             android:layout_height="wrap_content"
             android:background="@drawable/background_sent_message"
             android:padding="12dp"
-            android:maxWidth="200dp"
+            android:maxWidth="250dp"
             android:text="hello"
             android:layout_gravity="end"
             android:textColor="@color/white"
             android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/text_message_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Status"
-            android:textColor="@color/gray_500"
-            android:layout_gravity="end" />
     </LinearLayout>
 
 

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import io.diendanx.labbooking.Helpers.DateTimeFormatter;
 import io.diendanx.labbooking.Helpers.FireBaseUtil;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.models.ChatMessage;
@@ -21,10 +22,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     private Context context;
 
     private List<ChatMessage> chatMessages;
+    private DateTimeFormatter dateTimeFormatter;
 
     public ChatAdapter(Context context, List<ChatMessage> chatMessages) {
         this.context = context;
         this.chatMessages = chatMessages;
+        this.dateTimeFormatter = new DateTimeFormatter();
     }
 
     public void setChatMessages(List<ChatMessage> chatMessages) {
@@ -40,20 +43,45 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
-
-        holder.txtMessageStatus.setVisibility(View.GONE);
-        holder.txtSentDateTime.setVisibility(View.GONE);
+        holder.txtSentDateTime.setVisibility(View.GONE); // Initially hide the sent date time text
 
         ChatMessage chatMessage = chatMessages.get(position);
+
+        // Format the timestamp to a human-readable format
+        if (chatMessage.getTimestamp() != null) {
+            holder.txtSentDateTime.setText(dateTimeFormatter.format(chatMessage.getTimestamp().toDate().toInstant( )));
+        }
 
         if (chatMessage.getSenderId().equals(FireBaseUtil.currentUserId())) {
             holder.rightChatLayout.setVisibility(View.VISIBLE);
             holder.leftChatLayout.setVisibility(View.GONE);
             holder.txtSentMessage.setText(chatMessage.getMessage());
+            holder.rightChatLayout.setOnClickListener(v -> {
+                // Toggle visibility of the sent date time text
+                if (holder.txtSentDateTime.getVisibility() != View.VISIBLE) {
+                    holder.txtSentDateTime.setVisibility(View.VISIBLE);
+                    holder.txtSentDateTime.animate().alpha(1f).setDuration(200).start(); // Show with animation
+                } else {
+                    holder.txtSentDateTime.animate().alpha(0f).setDuration(200).withEndAction(() -> {
+                        holder.txtSentDateTime.setVisibility(View.GONE);
+                    }).start(); // Hide with animation
+                }
+            });
         } else {
             holder.leftChatLayout.setVisibility(View.VISIBLE);
             holder.rightChatLayout.setVisibility(View.GONE);
             holder.txtReceivedMessage.setText(chatMessage.getMessage());
+            holder.leftChatLayout.setOnClickListener(v -> {
+                // Toggle visibility of the sent date time text
+                if (holder.txtSentDateTime.getVisibility() != View.VISIBLE) {
+                    holder.txtSentDateTime.setVisibility(View.VISIBLE);
+                    holder.txtSentDateTime.animate().alpha(1f).setDuration(200).start(); // Show with animation
+                } else {
+                    holder.txtSentDateTime.animate().alpha(0f).setDuration(200).withEndAction(() -> {
+                        holder.txtSentDateTime.setVisibility(View.GONE);
+                    }).start(); // Hide with animation
+                }
+            });
         }
 
     }
@@ -66,7 +94,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
 
         LinearLayout leftChatLayout, rightChatLayout;
-        TextView txtReceivedMessage, txtSentMessage, txtSentDateTime, txtMessageStatus;
+        TextView txtReceivedMessage, txtSentMessage, txtSentDateTime;
 
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,7 +103,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             txtSentDateTime = itemView.findViewById(R.id.text_message_sent_time);
             leftChatLayout = itemView.findViewById(R.id.left_chat_layout);
             rightChatLayout = itemView.findViewById(R.id.right_chat_layout);
-            txtMessageStatus = itemView.findViewById(R.id.text_message_status);
         }
     }
 }
