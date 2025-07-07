@@ -91,10 +91,30 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     private String formatPrice(Long price) {
         if (price == null) return "";
         try {
-            NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-            return formatter.format(price) + " VND";
+            // Create more compact price format to prevent text wrapping
+            if (price >= 1000000) {
+                // Format millions (e.g., 1.5M VND/H)
+                double millions = price / 1000000.0;
+                if (millions == (long) millions) {
+                    return String.format("%dM VND/H", (long) millions);
+                } else {
+                    return String.format("%.1fM VND/H", millions);
+                }
+            } else if (price >= 100000) {
+                // Format hundreds of thousands (e.g., 150K VND/H)
+                long hundreds = price / 1000;
+                return String.format("%dK VND/H", hundreds);
+            } else if (price >= 1000) {
+                // Format thousands (e.g., 50K VND/H)
+                long thousands = price / 1000;
+                return String.format("%dK VND/H", thousands);
+            } else {
+                // Format small amounts normally
+                return price + " VND/H";
+            }
         } catch (Exception e) {
-            return price + " VND";
+            // Fallback to simple format
+            return price + " VND/H";
         }
     }
 }
