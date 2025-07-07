@@ -2,6 +2,8 @@ package io.diendanx.labbooking.activities.Home.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -18,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,6 +35,8 @@ import java.util.Locale;
 import io.diendanx.labbooking.Helpers.ImageGetterUtils;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.ProductDetail.ProductDetailActivity;
+import io.diendanx.labbooking.activities.Home.adapters.ImageSliderAdapter;
+import io.diendanx.labbooking.activities.Home.adapters.ProductAdapter;
 import io.diendanx.labbooking.models.Package;
 
 public class ProductsFragment extends Fragment {
@@ -42,19 +48,33 @@ public class ProductsFragment extends Fragment {
     private ProgressBar progressBar;
     private View layoutEmptyState;
     private TextView tvSectionTitle, tvPackageCount;
+    private ViewPager2 viewPagerSlider;
+    private LinearLayout dotsIndicator;
 
     private ProductAdapter adapter;
+    private ImageSliderAdapter sliderAdapter;
     private List<Package> allPackages = new ArrayList<>();
     private List<Package> displayedPackages = new ArrayList<>();
     private List<Package> popularPackages = new ArrayList<>();
 
+    private Handler sliderHandler = new Handler(Looper.getMainLooper());
+    private Runnable sliderRunnable;
+
     private String[] priceRanges = {
             "All Prices",
             "Under 50,000 VND",
+            "50,000 - 100,000 VND",
             "100,000 - 200,000 VND",
             "200,000 - 300,000 VND",
             "300,000 - 400,000 VND",
             "Above 500,000 VND"
+    };
+
+    private int[] sliderImages = {
+            R.drawable.slide1,
+            R.drawable.slide2,
+            R.drawable.slide3,
+            R.drawable.slide4
     };
 
     private int selectedPriceRange = 0;
@@ -68,6 +88,7 @@ public class ProductsFragment extends Fragment {
 
         try {
             initViews(view);
+            setupImageSlider();
             setupPriceFilter();
             setupTabs();
             setupRecyclerView();
@@ -85,9 +106,11 @@ public class ProductsFragment extends Fragment {
         // Fallback to layout
         View view = inflater.inflate(R.layout.fragment_products, container, false);
         RecyclerView rv = view.findViewById(R.id.rv_products);
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ProductAdapter(allPackages);
-        rv.setAdapter(adapter);
+        if (rv != null) {
+            rv.setLayoutManager(new LinearLayoutManager(getContext()));
+            adapter = new ProductAdapter(allPackages);
+            rv.setAdapter(adapter);
+        }
         fetchPackagesFromFirebase();
         return view;
     }
@@ -102,6 +125,92 @@ public class ProductsFragment extends Fragment {
         layoutEmptyState = view.findViewById(R.id.layout_empty_state);
         tvSectionTitle = view.findViewById(R.id.tv_section_title);
         tvPackageCount = view.findViewById(R.id.tv_package_count);
+        viewPagerSlider = view.findViewById(R.id.view_page_slider);
+        dotsIndicator = view.findViewById(R.id.dots_indicator);
+    }
+
+    private void setupImageSlider() {
+        if (viewPagerSlider == null) return;
+
+        sliderAdapter = new ImageSliderAdapter(getContext(), sliderImages);
+        viewPagerSlider.setAdapter(sliderAdapter);
+
+        setupCompactDotsIndicator();
+        setupSliderCallback();
+        startAutoSlide();
+    }
+
+    private void setupCompactDotsIndicator() {
+        if (dotsIndicator == null) return;
+
+        dotsIndicator.removeAllViews();
+        ImageView[] dots = new ImageView[sliderImages.length];
+
+        for (int i = 0; i < sliderImages.length; i++) {
+            dots[i] = new ImageView(getContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    dpToPx(6), dpToPx(6)
+            );
+            params.setMargins(dpToPx(3), 0, dpToPx(3), 0);
+            dots[i].setLayoutParams(params);
+            dots[i].setImageResource(R.drawable.dot_inactive);
+            dotsIndicator.addView(dots[i]);
+        }
+
+        if (dots.length > 0) {
+            dots[0].setImageResource(R.drawable.dot_active);
+        }
+    }
+
+    private void setupSliderCallback() {
+        if (viewPagerSlider == null) return;
+
+        viewPagerSlider.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                updateCompactDotsIndicator(position);
+                resetAutoSlide();
+            }
+        });
+    }
+
+    private void updateCompactDotsIndicator(int position) {
+        if (dotsIndicator == null) return;
+
+        for (int i = 0; i < dotsIndicator.getChildCount(); i++) {
+            ImageView dot = (ImageView) dotsIndicator.getChildAt(i);
+            if (i == position) {
+                dot.setImageResource(R.drawable.dot_active);
+            } else {
+                dot.setImageResource(R.drawable.dot_inactive);
+            }
+        }
+    }
+
+    private void startAutoSlide() {
+        sliderRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (viewPagerSlider != null && sliderAdapter != null) {
+                    int currentItem = viewPagerSlider.getCurrentItem();
+                    int nextItem = (currentItem + 1) % sliderAdapter.getItemCount();
+                    viewPagerSlider.setCurrentItem(nextItem, true);
+                    sliderHandler.postDelayed(this, 5000); // Auto slide every 5 seconds
+                }
+            }
+        };
+        sliderHandler.postDelayed(sliderRunnable, 5000);
+    }
+
+    private void resetAutoSlide() {
+        if (sliderHandler != null && sliderRunnable != null) {
+            sliderHandler.removeCallbacks(sliderRunnable);
+            startAutoSlide();
+        }
+    }
+
+    private int dpToPx(int dp) {
+        return (int) (dp * getResources().getDisplayMetrics().density);
     }
 
     private void setupPriceFilter() {
@@ -168,16 +277,14 @@ public class ProductsFragment extends Fragment {
                         }
                     }
 
-
-                        processPackages();
-                        showLoading(false);
+                    processPackages();
+                    showLoading(false);
                 })
                 .addOnFailureListener(e -> {
                     showLoading(false);
                     showEmptyState(true);
                 });
     }
-
 
     private void processPackages() {
         // Create popular packages (top 3 by price)
@@ -239,9 +346,10 @@ public class ProductsFragment extends Fragment {
         switch (priceRangeIndex) {
             case 1: return price < 50000;
             case 2: return price >= 50000 && price <= 100000;
-            case 3: return price > 200000 && price <= 300000;
-            case 4: return price > 300000 && price <= 400000;
-            case 5: return price > 500000;
+            case 3: return price > 100000 && price <= 200000;
+            case 4: return price > 200000 && price <= 300000;
+            case 5: return price > 300000 && price <= 400000;
+            case 6: return price > 500000;
             default: return true;
         }
     }
@@ -268,72 +376,30 @@ public class ProductsFragment extends Fragment {
         }
     }
 
-    // Product Adapter Class
-    class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
-        private final List<Package> packages;
-
-        ProductAdapter(List<Package> packages) {
-            this.packages = packages;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Clean up auto-slide handler
+        if (sliderHandler != null && sliderRunnable != null) {
+            sliderHandler.removeCallbacks(sliderRunnable);
         }
+    }
 
-        @NonNull
-        @Override
-        public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_product, parent, false);
-            return new ProductViewHolder(v);
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Pause auto-slide when fragment is not visible
+        if (sliderHandler != null && sliderRunnable != null) {
+            sliderHandler.removeCallbacks(sliderRunnable);
         }
+    }
 
-        @Override
-        public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-            try {
-                Package p = packages.get(position);
-                holder.tvName.setText(p.getName());
-                holder.tvDescription.setText(p.getDescription());
-                holder.tvPrice.setText(formatPrice(p.getPrice()));
-                // Load image using Glide utility
-                ImageGetterUtils.loadImage(holder.itemView.getContext(), p.getImageUrl(), holder.imageProduct);
-
-                holder.itemView.setOnClickListener(v -> {
-                    try {
-                        Intent intent = new Intent(getActivity(), ProductDetailActivity.class);
-                        intent.putExtra("package_id", p.getId());
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return packages != null ? packages.size() : 0;
-        }
-
-        class ProductViewHolder extends RecyclerView.ViewHolder {
-            TextView tvName, tvDescription, tvPrice;
-            ImageView imageProduct;
-
-            ProductViewHolder(@NonNull View itemView) {
-                super(itemView);
-                tvName = itemView.findViewById(R.id.tv_product_name);
-                tvDescription = itemView.findViewById(R.id.tv_product_description);
-                tvPrice = itemView.findViewById(R.id.tv_product_price);
-                imageProduct = itemView.findViewById(R.id.image_product);
-            }
-        }
-
-        private String formatPrice(Long price) {
-            if (price == null) return "";
-            try {
-                NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-                return formatter.format(price) + " VND";
-            } catch (Exception e) {
-                return price + " VND";
-            }
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Resume auto-slide when fragment becomes visible
+        if (viewPagerSlider != null && sliderAdapter != null) {
+            startAutoSlide();
         }
     }
 }
