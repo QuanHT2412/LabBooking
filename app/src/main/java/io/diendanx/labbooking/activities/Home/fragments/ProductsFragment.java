@@ -1,6 +1,5 @@
 package io.diendanx.labbooking.activities.Home.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -60,6 +59,14 @@ public class ProductsFragment extends Fragment {
     private Handler sliderHandler = new Handler(Looper.getMainLooper());
     private Runnable sliderRunnable;
 
+    // Use drawable resource ids for slider images
+    private final int[] sliderImageResIds = {
+            R.drawable.slide1,
+            R.drawable.slide2,
+            R.drawable.slide3,
+            R.drawable.slide4
+    };
+
     private String[] priceRanges = {
             "All Prices",
             "Under 50,000 VND",
@@ -68,13 +75,6 @@ public class ProductsFragment extends Fragment {
             "200,000 - 300,000 VND",
             "300,000 - 400,000 VND",
             "Above 500,000 VND"
-    };
-
-    private int[] sliderImages = {
-            R.drawable.slide1,
-            R.drawable.slide2,
-            R.drawable.slide3,
-            R.drawable.slide4
     };
 
     private int selectedPriceRange = 0;
@@ -88,7 +88,7 @@ public class ProductsFragment extends Fragment {
 
         try {
             initViews(view);
-            setupImageSlider();
+            setupImageSlider(); // Use drawables directly
             setupPriceFilter();
             setupTabs();
             setupRecyclerView();
@@ -132,7 +132,8 @@ public class ProductsFragment extends Fragment {
     private void setupImageSlider() {
         if (viewPagerSlider == null) return;
 
-        sliderAdapter = new ImageSliderAdapter(getContext(), sliderImages);
+        // Use the updated ImageSliderAdapter constructor for drawables
+        sliderAdapter = new ImageSliderAdapter(getContext(), sliderImageResIds);
         viewPagerSlider.setAdapter(sliderAdapter);
 
         setupCompactDotsIndicator();
@@ -141,12 +142,12 @@ public class ProductsFragment extends Fragment {
     }
 
     private void setupCompactDotsIndicator() {
-        if (dotsIndicator == null) return;
+        if (dotsIndicator == null || sliderImageResIds == null) return;
 
         dotsIndicator.removeAllViews();
-        ImageView[] dots = new ImageView[sliderImages.length];
+        ImageView[] dots = new ImageView[sliderImageResIds.length];
 
-        for (int i = 0; i < sliderImages.length; i++) {
+        for (int i = 0; i < sliderImageResIds.length; i++) {
             dots[i] = new ImageView(getContext());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     dpToPx(6), dpToPx(6)
@@ -403,3 +404,4 @@ public class ProductsFragment extends Fragment {
         }
     }
 }
+

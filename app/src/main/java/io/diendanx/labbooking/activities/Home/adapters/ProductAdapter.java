@@ -14,6 +14,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
+import io.diendanx.labbooking.Helpers.ImageGetterUtils;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.ProductDetail.ProductDetailActivity;
 import io.diendanx.labbooking.models.Package;
@@ -41,13 +42,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             holder.tvDescription.setText(p.getDescription());
             holder.tvPrice.setText(formatPrice(p.getPrice()));
 
-            int[] packageImages = {
-                R.drawable.package_image_1,
-                R.drawable.package_image_2,
-                R.drawable.package_image_3
-            };
-            int imageResId = packageImages[position % packageImages.length];
-            holder.imageProduct.setImageResource(imageResId);
+            // Load image from URL using ImageGetterUtils
+            if (p.getImageUrl() != null && !p.getImageUrl().isEmpty()) {
+                ImageGetterUtils.loadImage(
+                        holder.itemView.getContext(),
+                        p.getImageUrl(),
+                        holder.imageProduct
+                );
+            } else {
+                // Set fallback image if no URL available
+                holder.imageProduct.setImageResource(R.drawable.image_not_found);
+            }
 
             holder.itemView.setOnClickListener(v -> {
                 try {
@@ -60,6 +65,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             });
         } catch (Exception e) {
             e.printStackTrace();
+            // Set fallback image on error
+            holder.imageProduct.setImageResource(R.drawable.image_not_found);
         }
     }
 
@@ -91,4 +98,3 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         }
     }
 }
-
