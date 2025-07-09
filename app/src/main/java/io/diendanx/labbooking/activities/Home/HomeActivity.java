@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
@@ -23,12 +24,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.List;
 import java.util.Stack;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Cart.CartActivity;
 import io.diendanx.labbooking.activities.Home.adapters.HomePagerAdapter;
 import io.diendanx.labbooking.activities.SignIn.SignInActivity;
+import io.diendanx.labbooking.models.Cart;
+import io.diendanx.labbooking.repository.BaseRepository;
+import io.diendanx.labbooking.repository.CartRepository;
 import io.diendanx.labbooking.services.CartNotificationService;
 
 public class HomeActivity extends AppCompatActivity {
@@ -39,7 +44,7 @@ public class HomeActivity extends AppCompatActivity {
     private CartNotificationService cartNotificationService;
     private final Stack<Integer> fragmentBackStack = new Stack<>();
     private final int REQUEST_NOTIFICATION_PERMISSION = 100;
-    private int cartItemCount = 0;
+    private CartRepository cartRepository;
     private Button btnSignOut;
     private FirebaseAuth mAuth;
 
@@ -73,7 +78,7 @@ public class HomeActivity extends AppCompatActivity {
         initViews();
         setListeners();
         handleBackPress();
-        cartItemCount = countCartItems();
+        cartRepository = new CartRepository();
         cartNotificationService = new CartNotificationService(this);
         tryShowCartNotification();
 
@@ -84,6 +89,7 @@ public class HomeActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottom_navigation);
         topAppBar = findViewById(R.id.top_app_bar);
         tvCartBadge = findViewById(R.id.tv_cart_badge);
+        tvCartBadge.setVisibility(View.GONE); // Initially hide the cart badge
         mAuth = FirebaseAuth.getInstance();
 
         // set adapter for viewPager
@@ -183,34 +189,55 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showCartNotification() {
-        if (cartItemCount > 0) {
-            cartNotificationService.showNotification(
-                    "Items in Cart",
-                    "You have " + countCartItems() + " items waiting in your cart"
-            );
-        }
+        cartRepository.countCartItems(mAuth.getCurrentUser().getUid(), new BaseRepository.ListCallback<Cart>() {
+            @Override
+            public void onSuccess(List<Cart> items) {
+                int count = items.size();
+                if (count > 0) {
+                    tvCartBadge.setVisibility(View.VISIBLE);
+                    tvCartBadge.setText(String.valueOf(count));
+                    cartNotificationService.showNotification(
+                            "Items in Cart",
+                            "You have " + count + " items waiting in your cart"
+                    );
+                } else {
+                    tvCartBadge.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Failed to count cart items: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateCartBadge();
+        countCartItems();
     }
 
-    private void updateCartBadge() {
-        
-        int count = countCartItems();
-
-        
-        if (count > 0) {
-            tvCartBadge.setVisibility(View.VISIBLE);
-            tvCartBadge.setText(String.valueOf(count));
-        } else {
-            tvCartBadge.setVisibility(View.GONE);
-        }
-    }
 
     private int countCartItems() {
+        // count items in the cart
+        cartRepository.countCartItems(mAuth.getCurrentUser().getUid(), new BaseRepository.ListCallback<Cart>() {
+            @Override
+            public void onSuccess(List<Cart> items) {
+                int count = items.size();
+                if (count > 0) {
+                    tvCartBadge.setVisibility(View.VISIBLE);
+                    tvCartBadge.setText(String.valueOf(count));
+                } else {
+                    tvCartBadge.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getApplicationContext(), "Failed to count cart items: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
         return 5;
     }
 

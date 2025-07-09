@@ -1,5 +1,6 @@
 package io.diendanx.labbooking.activities.Cart;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Cart.adapters.CartAdapter;
+import io.diendanx.labbooking.activities.OrderConfirmation.OrderConfirmationActivity;
 import io.diendanx.labbooking.models.Cart;
 import io.diendanx.labbooking.models.Facility;
 import io.diendanx.labbooking.models.Package;
@@ -105,7 +107,18 @@ public class CartActivity extends AppCompatActivity {
                     }
                 }
                 if (pkg != null) {
-                    total += pkg.getPrice();
+                    total += (long)(pkg.getPrice() * (Math.ceil((double) cart.getDuration() / 60)));
+                }
+
+                if (cart.getSelectedFacilities() != null && facilities != null) {
+                    for (String facilityId : cart.getSelectedFacilities()) {
+                        for (Facility facility : facilities) {
+                            if (facility.getId().equals(facilityId)) {
+                                total += facility.getPrice();
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -114,7 +127,19 @@ public class CartActivity extends AppCompatActivity {
 
     private void removeCartItem(int position) {
         if (cartList != null && position >= 0 && position < cartList.size()) {
+            String cartId = cartList.get(position).getId();
             cartList.remove(position);
+            cartRepository.delete(cartId, new CartRepository.ItemCallback<Cart>() {
+                @Override
+                public void onSuccess(Cart item) {
+                    Toast.makeText(CartActivity.this, "Cart item removed successfully", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(CartActivity.this, "Failed to remove cart item: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
             adapter.notifyItemRemoved(position);
             updateEmptyState();
             updateProceedButtonText();
@@ -123,6 +148,9 @@ public class CartActivity extends AppCompatActivity {
 
     private void proceedOrder() {
         // TODO: Implement order proceeding logic
+        Intent intent = new Intent(CartActivity.this, OrderConfirmationActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 

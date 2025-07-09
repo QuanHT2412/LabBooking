@@ -15,7 +15,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
 import io.diendanx.labbooking.activities.SignIn.SignInActivity;
-import io.diendanx.labbooking.activities.LabMap.LabMapActivity;
 
 
 public class MainActivity extends AppCompatActivity {

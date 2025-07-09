@@ -8,19 +8,20 @@ public class Cart {
     private String id;
     private String userId;
     private String packageId;
-
     private int duration;
     private Timestamp startDate;
     private List<String> selectedFacilities;
+    private long totalPrice;
 
     public Cart() {}
 
-    public Cart(String userId, String packageId, int duration, Timestamp startDate, List<String> selectedFacilities) {
+    public Cart(String userId, String packageId, int duration, Timestamp startDate, List<String> selectedFacilities, long totalPrice) {
         this.userId = userId;
         this.packageId = packageId;
         this.duration = duration;
         this.startDate = startDate;
         this.selectedFacilities = selectedFacilities;
+        this.totalPrice = totalPrice;
     }
 
 
@@ -70,5 +71,12 @@ public class Cart {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public long getTotalPrice() {
+        return totalPrice;
+    }
+    public void setTotalPrice(long totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

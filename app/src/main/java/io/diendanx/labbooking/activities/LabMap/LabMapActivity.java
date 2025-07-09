@@ -20,6 +20,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.MainActivity;
@@ -38,6 +39,13 @@ public class LabMapActivity extends AppCompatActivity implements OnMapReadyCallb
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Setup toolbar back navigation
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+
         requestForPermissions();
     }
 

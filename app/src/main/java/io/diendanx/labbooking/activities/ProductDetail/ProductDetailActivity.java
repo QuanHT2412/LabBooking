@@ -1,6 +1,8 @@
 package io.diendanx.labbooking.activities.ProductDetail;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,9 +17,12 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Map;
 
 import io.diendanx.labbooking.Helpers.ImageGetterUtils;
 import io.diendanx.labbooking.R;
+import io.diendanx.labbooking.activities.CartConfirm.CartConfirmActivity;
+import io.diendanx.labbooking.activities.LabMap.LabMapActivity;
 import io.diendanx.labbooking.models.Package;
 import io.diendanx.labbooking.repository.PackageRepository;
 import io.diendanx.labbooking.repository.BaseRepository;
@@ -26,6 +31,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private TextView tvName, tvInfo, tvPrice, tvDescription;
     private ImageView imagePackage;
+    private Button btnAddToCart,btnMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +56,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         tvPrice = findViewById(R.id.tv_package_price);
         tvDescription = findViewById(R.id.package_description_text);
         imagePackage = findViewById(R.id.image_package);
+        btnAddToCart = findViewById(R.id.btn_add_to_cart);
+        btnMap = findViewById(R.id.btn_map);
 
         // Get package id from intent
         String packageId = getIntent().getStringExtra("package_id");
@@ -59,6 +67,23 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Package not found", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+        btnAddToCart.setOnClickListener(v -> {
+
+            // close this activity
+            Intent intent = new Intent(ProductDetailActivity.this, CartConfirmActivity.class);
+            intent.putExtra("package_id", packageId);
+            intent.putExtra("package_price", tvPrice.getText().toString());
+            startActivity(intent);
+        });
+
+        btnMap.setOnClickListener(v -> {
+            // Handle map button click
+            Intent intent = new Intent(ProductDetailActivity.this, LabMapActivity.class);
+            intent.putExtra("package_id", packageId);
+            intent.putExtra("package_price", tvPrice.getText().toString());
+            startActivity(intent);
+        });
     }
 
     private void fetchPackageDetail(String packageId) {
