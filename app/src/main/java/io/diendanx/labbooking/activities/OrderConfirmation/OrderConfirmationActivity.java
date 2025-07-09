@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +35,8 @@ import io.diendanx.labbooking.models.OrderItem;
 import io.diendanx.labbooking.models.Package;
 import io.diendanx.labbooking.repository.BaseRepository;
 import io.diendanx.labbooking.repository.CartRepository;
-import io.diendanx.labbooking.repository.OrderItemRepository;
-import io.diendanx.labbooking.repository.OrderRepository;
+import io.diendanx.labbooking.repository.OrdersItemRepository;
+import io.diendanx.labbooking.repository.OrdersRepository;
 import io.diendanx.labbooking.repository.PackageRepository;
 
 public class OrderConfirmationActivity extends AppCompatActivity {
@@ -44,10 +46,11 @@ public class OrderConfirmationActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private CartRepository cartRepository;
     private PackageRepository packageRepository;
-    private OrderRepository orderRepository;
-    private OrderItemRepository orderItemRepository;
+    private OrdersRepository orderRepository;
+    private OrdersItemRepository orderItemRepository;
     private int countOrderItems = 0;
     private List<Package> packages = new ArrayList<>();
+    private TableLayout tableOrderSummary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,11 +91,12 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.et_email);
         etPhone = findViewById(R.id.et_phone);
         btnConfirm = findViewById(R.id.btn_confirm);
+        tableOrderSummary = findViewById(R.id.table_order_summary);
         mAuth = FirebaseAuth.getInstance();
         cartRepository = new CartRepository();
         packageRepository = new PackageRepository();
-        orderRepository = new OrderRepository();
-        orderItemRepository = new OrderItemRepository();
+        orderRepository = new OrdersRepository();
+        orderItemRepository = new OrdersItemRepository();
 
         etEmail.setText(mAuth.getCurrentUser().getEmail());
     }
@@ -234,5 +238,145 @@ public class OrderConfirmationActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadOrderSummary();
+    }
+
+    private void loadOrderSummary() {
+        String userId = mAuth.getCurrentUser().getUid();
+        cartRepository.countCartItems(userId, new BaseRepository.ListCallback<Cart>() {
+            @Override
+            public void onSuccess(List<Cart> items) {
+                displayOrderSummary(items);
+            }
+            @Override
+            public void onFailure(Exception e) {
+                // Handle error
+            }
+        });
+    }
+
+    private void displayOrderSummary(List<Cart> items) {
+        tableOrderSummary.removeAllViews();
+        Context context = this;
+        // Header row
+        TableRow headerRow = new TableRow(context);
+        // Icon header
+        TextView tvHeaderIcon = new TextView(context);
+        tvHeaderIcon.setText("");
+        tvHeaderIcon.setPadding(0, 0, 24, 0);
+        headerRow.addView(tvHeaderIcon);
+        // Package name
+        TextView tvHeader1 = new TextView(context);
+        tvHeader1.setText("Package");
+        tvHeader1.setPadding(0, 0, 16, 0);
+        tvHeader1.setTextColor(ContextCompat.getColor(context, R.color.main_900));
+        tvHeader1.setTypeface(tvHeader1.getTypeface(), android.graphics.Typeface.BOLD);
+        // Date
+        TextView tvHeader2 = new TextView(context);
+        tvHeader2.setText("Date");
+        tvHeader2.setPadding(0, 0, 16, 0);
+        tvHeader2.setTextColor(ContextCompat.getColor(context, R.color.main_900));
+        tvHeader2.setTypeface(tvHeader2.getTypeface(), android.graphics.Typeface.BOLD);
+        // Time
+        TextView tvHeader3 = new TextView(context);
+        tvHeader3.setText("Time");
+        tvHeader3.setPadding(0, 0, 16, 0);
+        tvHeader3.setTextColor(ContextCompat.getColor(context, R.color.main_900));
+        tvHeader3.setTypeface(tvHeader3.getTypeface(), android.graphics.Typeface.BOLD);
+        headerRow.addView(tvHeader1);
+        headerRow.addView(tvHeader2);
+        headerRow.addView(tvHeader3);
+        tableOrderSummary.addView(headerRow);
+
+        long totalPrice = 0;
+        boolean alternate = false;
+        for (Cart cart : items) {
+            String packageName = "";
+            String date = "-";
+            String timeRange = "-";
+            int iconRes = R.drawable.ic_package;
+            if (cart.getStartDate() != null && cart.getDuration() > 0) {
+                java.util.Date start = cart.getStartDate().toDate();
+                java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                java.text.SimpleDateFormat hourFormat = new java.text.SimpleDateFormat("HH:mm");
+                date = dateFormat.format(start);
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.setTime(start);
+                String fromHour = hourFormat.format(start);
+                cal.add(java.util.Calendar.HOUR_OF_DAY, (int) cart.getDuration());
+                String toHour = hourFormat.format(cal.getTime());
+                timeRange = fromHour + " - " + toHour;
+            }
+            for (Package pkg : packages) {
+                if (pkg.getId().equals(cart.getPackageId())) {
+                    packageName = pkg.getName();
+                    if (packageName.endsWith(" Package")) {
+                        packageName = packageName.replace(" Package", "");
+                    }
+                    break;
+                }
+            }
+            TableRow row = new TableRow(context);
+            if (alternate) {
+                row.setBackground(ContextCompat.getDrawable(context, R.drawable.bg_table_row_alt));
+            }
+            // Icon
+            TextView tvIcon = new TextView(context);
+            tvIcon.setPadding(0, 0, 24, 0);
+            tvIcon.setText("\uD83D\uDCE6"); // 📦 fallback icon
+            tvIcon.setTextSize(20);
+            row.addView(tvIcon);
+            // Package name
+            TextView tvName = new TextView(context);
+            tvName.setText(packageName);
+            tvName.setPadding(0, 0, 16, 0);
+            tvName.setTextColor(ContextCompat.getColor(context, R.color.main_900));
+            tvName.setTextSize(16);
+            row.addView(tvName);
+            // Date
+            TextView tvDate = new TextView(context);
+            tvDate.setText(date);
+            tvDate.setPadding(0, 0, 16, 0);
+            tvDate.setTextColor(ContextCompat.getColor(context, R.color.main_700));
+            tvDate.setTextSize(15);
+            row.addView(tvDate);
+            // Time
+            TextView tvTime = new TextView(context);
+            tvTime.setText(timeRange);
+            tvTime.setPadding(0, 0, 16, 0);
+            tvTime.setTextColor(ContextCompat.getColor(context, R.color.main_700));
+            tvTime.setTextSize(15);
+            row.addView(tvTime);
+            tableOrderSummary.addView(row);
+            totalPrice += cart.getTotalPrice();
+            alternate = !alternate;
+        }
+        // Total row
+        TableRow totalRow = new TableRow(context);
+        TextView tvTotalLabel = new TextView(context);
+        tvTotalLabel.setText("Total");
+        tvTotalLabel.setPadding(0, 20, 16, 0);
+        tvTotalLabel.setTextColor(ContextCompat.getColor(context, R.color.main_900));
+        tvTotalLabel.setTypeface(tvTotalLabel.getTypeface(), android.graphics.Typeface.BOLD);
+        tvTotalLabel.setTextSize(16);
+        // Add empty cells for alignment
+        TextView emptyCell1 = new TextView(context);
+        TextView emptyCell2 = new TextView(context);
+        TextView tvTotalValue = new TextView(context);
+        tvTotalValue.setText(String.format("%,d VND", totalPrice));
+        tvTotalValue.setPadding(0, 20, 0, 0);
+        tvTotalValue.setTextColor(ContextCompat.getColor(context, R.color.main_900));
+        tvTotalValue.setTypeface(tvTotalValue.getTypeface(), android.graphics.Typeface.BOLD);
+        tvTotalValue.setTextSize(14); // smaller size for total amount
+        totalRow.addView(tvTotalLabel);
+        totalRow.addView(emptyCell1);
+        totalRow.addView(emptyCell2);
+        totalRow.addView(tvTotalValue);
+        tableOrderSummary.addView(totalRow);
     }
 }

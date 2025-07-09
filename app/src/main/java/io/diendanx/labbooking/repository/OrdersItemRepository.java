@@ -2,9 +2,9 @@ package io.diendanx.labbooking.repository;
 
 import io.diendanx.labbooking.models.OrderItem;
 
-public class OrderItemRepository extends BaseRepository<OrderItem> {
+public class OrdersItemRepository extends BaseRepository<OrderItem> {
 
-    public OrderItemRepository() {
+    public OrdersItemRepository() {
         super("order_item");
     }
 

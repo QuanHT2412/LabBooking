@@ -44,7 +44,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.Facili
         Facility facility = facilityList.get(position);
         holder.name.setText(facility.getName());
         holder.description.setText(facility.getDescription());
-        holder.price.setText(facility.getPrice() + " đ");
+        holder.price.setText(formatPrice(facility.getPrice()));
 
         holder.checkBox.setOnCheckedChangeListener(null); // avoid unwanted triggers
         holder.checkBox.setChecked(selectedFacilities.contains(facility));
@@ -65,8 +65,7 @@ public class FacilityAdapter extends RecyclerView.Adapter<FacilityAdapter.Facili
         return facilityList.size();
     }
 
-    private String formatPrice(Long price) {
-        if (price == null) return "";
+    private String formatPrice(double price) {
         try {
             NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
             return formatter.format(price) + "đ";
