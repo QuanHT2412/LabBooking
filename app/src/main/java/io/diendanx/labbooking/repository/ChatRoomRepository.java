@@ -76,4 +76,8 @@ public class ChatRoomRepository extends BaseRepository<ChatRoom> {
                     }
                 });
     }
+
+    public CollectionReference getRef() {
+        return ref;
+    }
 }

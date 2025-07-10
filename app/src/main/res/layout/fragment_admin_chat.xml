@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/main"
+    android:fitsSystemWindows="false"
+    android:background="@color/main_50">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/main_900"
+        android:minHeight="56dp"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/main_50"
+        app:title="Tên người dùng"
+        app:titleTextColor="@color/main_50"
+        app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topAppBar"
+        android:layout_above="@id/bottomBar"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomBar"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp">
+
+        <EditText
+            android:id="@+id/edt_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Type your message"
+            android:textColorHint="@color/gray_500"
+            android:background="@drawable/background_chat_input"
+            app:layout_constraintEnd_toStartOf="@+id/message_send_btn"
+            app:layout_constraintStart_toStartOf="@id/bottomBar"
+            app:layout_constraintBottom_toBottomOf="@id/bottomBar"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginEnd="12dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="5dp"
+            android:minLines="2"
+            android:maxLines="5"
+            android:gravity="center_vertical"
+            android:inputType="textMultiLine" />
+
+        <ImageButton
+            android:id="@+id/message_send_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/icon_send"
+            android:layout_marginBottom="15dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/main_900"
+            app:layout_constraintBottom_toBottomOf="@id/bottomBar"
+            app:layout_constraintEnd_toEndOf="@id/bottomBar" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>
