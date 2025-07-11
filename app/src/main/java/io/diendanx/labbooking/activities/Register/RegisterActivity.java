@@ -34,6 +34,9 @@ import io.diendanx.labbooking.Helpers.ValidatorsUtils;
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.activities.Home.HomeActivity;
 import io.diendanx.labbooking.activities.SignIn.SignInActivity;
+import io.diendanx.labbooking.models.User;
+import io.diendanx.labbooking.repository.BaseRepository;
+import io.diendanx.labbooking.repository.UserRepository;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -42,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
     private TextInputEditText emailEditText, passwordEditText, confirmPasswordEditText, nameEditText;
     private FirebaseAuth mAuth;
+    private UserRepository userRepository;
     private CircularProgressIndicator progressIndicator;
     private TextInputLayout emailInputLayout, passwordInputLayout, confirmPasswordInputLayout, nameInputLayout;
 
@@ -89,6 +93,7 @@ public class RegisterActivity extends AppCompatActivity {
         rootView = findViewById(R.id.main);
         mAuth = FirebaseAuth.getInstance();
         signInTextView = findViewById(R.id.txt_sign_in);
+        userRepository = new UserRepository();
     }
 
     private void setListeners() {
@@ -184,8 +189,8 @@ public class RegisterActivity extends AppCompatActivity {
                         mAuth.getCurrentUser().updateProfile(new UserProfileChangeRequest.Builder()
                                 .setDisplayName(name)
                                 .build());
-                        // Registration successful, navigate to HomeActivity or another activity
-                        startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                        saveUserInfoToFirestore(name, email, mAuth.getCurrentUser().getUid());
+
                     } else {
                         setProgress(false);
 
@@ -195,6 +200,31 @@ public class RegisterActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+private void saveUserInfoToFirestore(String name, String email, String userId) {
+        // create a new User object
+        User user = new User(name, userId, email);
+        userRepository.add(userId, user, new BaseRepository.ItemCallback<User>() {
+            @Override
+            public void onSuccess(User item) {
+                // User info saved successfully
+                setProgress(false);
+                // Registration successful, navigate to HomeActivity or another activity
+                startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Handle error while saving user info
+                setProgress(false);
+
+                clearInputFields();
+
+                Toast.makeText(RegisterActivity.this, "Register failed: ",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void clearInputFields() {

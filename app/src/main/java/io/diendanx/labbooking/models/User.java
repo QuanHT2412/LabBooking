@@ -4,17 +4,16 @@ import com.google.firebase.Timestamp;
 
 public class User {
     private String username;
-    private Timestamp createdAt;
     private String userId;
-    private String role;
+    private String email;
 
     public User() {
     }
 
-    public User(String username, Timestamp createdAt, String userId) {
+    public User(String username, String userId, String email) {
         this.username = username;
-        this.createdAt = createdAt;
         this.userId = userId;
+        this.email = email;
     }
 
     public String getUsername() {
@@ -25,19 +24,19 @@ public class User {
         this.username = username;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
