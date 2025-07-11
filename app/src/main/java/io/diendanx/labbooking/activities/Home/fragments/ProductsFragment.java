@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -26,10 +25,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import io.diendanx.labbooking.Helpers.ImageGetterUtils;
 import io.diendanx.labbooking.R;
@@ -41,9 +38,7 @@ import io.diendanx.labbooking.models.Package;
 public class ProductsFragment extends Fragment {
 
     private RecyclerView rvProducts;
-    private TabLayout tabLayout;
     private Spinner spinnerPriceRange;
-    private Button btnApplyFilter, btnClearFilter;
     private ProgressBar progressBar;
     private View layoutEmptyState;
     private TextView tvSectionTitle, tvPackageCount;
@@ -54,7 +49,6 @@ public class ProductsFragment extends Fragment {
     private ImageSliderAdapter sliderAdapter;
     private List<Package> allPackages = new ArrayList<>();
     private List<Package> displayedPackages = new ArrayList<>();
-    private List<Package> popularPackages = new ArrayList<>();
 
     private Handler sliderHandler = new Handler(Looper.getMainLooper());
     private Runnable sliderRunnable;
@@ -78,7 +72,6 @@ public class ProductsFragment extends Fragment {
     };
 
     private int selectedPriceRange = 0;
-    private int currentTab = 0; // 0 = Popular, 1 = All
 
     @Nullable
     @Override
@@ -90,7 +83,6 @@ public class ProductsFragment extends Fragment {
             initViews(view);
             setupImageSlider(); // Use drawables directly
             setupPriceFilter();
-            setupTabs();
             setupRecyclerView();
             fetchPackagesFromFirebase();
         } catch (Exception e) {
@@ -117,10 +109,7 @@ public class ProductsFragment extends Fragment {
 
     private void initViews(View view) {
         rvProducts = view.findViewById(R.id.rv_products);
-        tabLayout = view.findViewById(R.id.tab_layout);
         spinnerPriceRange = view.findViewById(R.id.spinner_price_range);
-        btnApplyFilter = view.findViewById(R.id.btn_apply_filter);
-        btnClearFilter = view.findViewById(R.id.btn_clear_filter);
         progressBar = view.findViewById(R.id.progress_bar);
         layoutEmptyState = view.findViewById(R.id.layout_empty_state);
         tvSectionTitle = view.findViewById(R.id.tv_section_title);
@@ -225,32 +214,15 @@ public class ProductsFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPriceRange.setAdapter(adapter);
 
-        if (btnApplyFilter != null) {
-            btnApplyFilter.setOnClickListener(v -> applyPriceFilter());
-        }
-        if (btnClearFilter != null) {
-            btnClearFilter.setOnClickListener(v -> clearPriceFilter());
-        }
-    }
-
-    private void setupTabs() {
-        if (tabLayout == null) return;
-
-        tabLayout.addTab(tabLayout.newTab().setText("Popular Packages"));
-        tabLayout.addTab(tabLayout.newTab().setText("All Packages"));
-
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        // Remove apply/clear buttons, filter immediately on selection
+        spinnerPriceRange.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                currentTab = tab.getPosition();
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedPriceRange = position;
                 updateDisplayedPackages();
             }
-
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -278,7 +250,9 @@ public class ProductsFragment extends Fragment {
                         }
                     }
 
-                    processPackages();
+                    // Remove processPackages(), just updateDisplayedPackages()
+                    updateDisplayedPackages();
+                    showEmptyState(allPackages.isEmpty());
                     showLoading(false);
                 })
                 .addOnFailureListener(e -> {
@@ -287,48 +261,11 @@ public class ProductsFragment extends Fragment {
                 });
     }
 
-    private void processPackages() {
-        // Create popular packages (top 3 by price)
-        popularPackages.clear();
-        List<Package> sortedPackages = new ArrayList<>(allPackages);
-
-        // Sort packages by price (bubble sort - decreasing)
-        for (int i = 0; i < sortedPackages.size() - 1; i++) {
-            for (int j = 0; j < sortedPackages.size() - i - 1; j++) {
-                if (sortedPackages.get(j).getPrice() < sortedPackages.get(j + 1).getPrice()) {
-                    Package temp = sortedPackages.get(j);
-                    sortedPackages.set(j, sortedPackages.get(j + 1));
-                    sortedPackages.set(j + 1, temp);
-                }
-            }
-        }
-
-        for (int i = 0; i < Math.min(3, sortedPackages.size()); i++) {
-            popularPackages.add(sortedPackages.get(i));
-        }
-
-        updateDisplayedPackages();
-        showEmptyState(allPackages.isEmpty());
-    }
-
-    private void applyPriceFilter() {
-        selectedPriceRange = spinnerPriceRange.getSelectedItemPosition();
-        updateDisplayedPackages();
-    }
-
-    private void clearPriceFilter() {
-        selectedPriceRange = 0;
-        spinnerPriceRange.setSelection(0);
-        updateDisplayedPackages();
-    }
-
     private void updateDisplayedPackages() {
         displayedPackages.clear();
 
-        List<Package> sourcePackages = currentTab == 0 ? popularPackages : allPackages;
-
-        // Apply price filter - using loop
-        for (Package pkg : sourcePackages) {
+        //Show allPackages, filtered by price
+        for (Package pkg : allPackages) {
             if (matchesPriceFilter(pkg, selectedPriceRange)) {
                 displayedPackages.add(pkg);
             }
@@ -357,7 +294,7 @@ public class ProductsFragment extends Fragment {
 
     private void updateUI() {
         if (tvSectionTitle != null) {
-            tvSectionTitle.setText(currentTab == 0 ? "Popular Packages" : "All Packages");
+            tvSectionTitle.setText("Available Packages");
         }
 
         if (tvPackageCount != null) {
