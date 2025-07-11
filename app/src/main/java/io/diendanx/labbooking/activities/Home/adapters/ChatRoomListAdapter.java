@@ -46,11 +46,9 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomListAdapte
             holder.tvSenderId.setText("Chưa có người gửi");
             holder.tvLastMessage.setText("Chưa có tin nhắn");
         } else {
-            Log.d("ChatRoomAdapter", "Fetching username for userId: " + room.getLastMessageSenderId());
-
             FirebaseFirestore.getInstance()
                     .collection("users")
-                    .document(room.getLastMessageSenderId())
+                    .document(room.getChatRoomId())
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {

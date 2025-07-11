@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -19,6 +20,8 @@ public class SettingsFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private Button btnSignOut;
+
+    private TextView tvUsername, tvEmail;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -37,6 +40,8 @@ public class SettingsFragment extends Fragment {
         setListeners();
 
         // Inflate the layout for this fragment
+        tvUsername.setText("User: " + mAuth.getCurrentUser().getDisplayName());
+        tvEmail.setText("Email: " + mAuth.getCurrentUser().getEmail());
         return v;
     }
 
@@ -50,5 +55,7 @@ public class SettingsFragment extends Fragment {
     private void initViews(View v) {
         btnSignOut = v.findViewById(R.id.btn_logout);
         mAuth = FirebaseAuth.getInstance();
+        tvUsername = v.findViewById(R.id.tv_username);
+        tvEmail = v.findViewById(R.id.tv_email);
     }
 }

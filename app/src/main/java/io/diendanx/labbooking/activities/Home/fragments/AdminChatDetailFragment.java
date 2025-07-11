@@ -76,12 +76,12 @@ public class AdminChatDetailFragment extends Fragment {
 
         // Lấy senderId từ tin nhắn cuối cùng để truy username
         FirebaseFirestore.getInstance()
-                .collection("chat_rooms")
+                .collection("chat_room")
                 .document(chatRoomId)
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        String senderId = doc.getString("lastMessageSenderId");
+                        String senderId = doc.getString("chatRoomId");
                         if (senderId != null && !senderId.isEmpty()) {
                             FirebaseFirestore.getInstance()
                                     .collection("users")
@@ -92,6 +92,8 @@ public class AdminChatDetailFragment extends Fragment {
                                             String username = userDoc.getString("username");
                                             if (username != null) {
                                                 topAppBar.setTitle(username);
+                                            } else {
+                                                topAppBar.setTitle("Unknown");
                                             }
                                         }
                                     });
