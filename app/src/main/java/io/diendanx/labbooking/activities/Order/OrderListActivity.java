@@ -1,6 +1,7 @@
 package io.diendanx.labbooking.activities.Order;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -17,6 +19,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.diendanx.labbooking.R;
 import io.diendanx.labbooking.models.Order;
@@ -56,38 +59,56 @@ public class OrderListActivity extends AppCompatActivity {
         loadOrders();
     }
 
-    // Loads orders for the current user
     private void loadOrders() {
         if (user == null) {
+            Log.d(TAG, "User is null");
             showEmptyState();
             return;
         }
         String mail = user.getEmail();
+        Log.d(TAG, "Loading orders for email: " + mail);
 
         db.collection("order")
                 .whereEqualTo("email", mail)
-                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         QuerySnapshot querySnapshot = task.getResult();
+                        Log.d(TAG, "Orders found: " + querySnapshot.size());
 
                         if (!querySnapshot.isEmpty()) {
                             orderList.clear();
                             List<Order> loadedOrders = new ArrayList<>();
 
+
                             for (QueryDocumentSnapshot doc : querySnapshot) {
                                 Order order = doc.toObject(Order.class);
                                 order.setId(doc.getId());
                                 loadedOrders.add(order);
+                                Log.d(TAG, "Order loaded: " + order.getId() + ", User: " + order.getUsername());
+                                Log.d(TAG, "Order items IDs: " + order.getOrderItems());
                             }
+                            loadedOrders.sort((order1, order2) -> {
+                                Timestamp timestamp1 = order1.getCreated_at();
+                                Timestamp timestamp2 = order2.getCreated_at();
+
+                                // Handle null timestamps
+                                if (timestamp1 == null && timestamp2 == null) return 0;
+                                if (timestamp1 == null) return 1;
+                                if (timestamp2 == null) return -1;
+
+                                // Sort in descending order (newest first)
+                                return timestamp2.compareTo(timestamp1);
+                            });
 
                             orderList.addAll(loadedOrders);
                             loadOrderItemsForOrders(loadedOrders);
                         } else {
+                            Log.d(TAG, "No orders found");
                             showEmptyState();
                         }
                     } else {
+                        Log.e(TAG, "Error loading orders", task.getException());
                         showEmptyState();
                     }
                 });

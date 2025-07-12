@@ -3,6 +3,7 @@ package io.diendanx.labbooking.models;
 import com.google.firebase.Timestamp;
 
 import java.util.List;
+import java.util.Map;
 
 public class Order {
     private String id;
@@ -91,4 +92,5 @@ public class Order {
     public void setEmail(String email) {
         this.email = email;
     }
+
 }
