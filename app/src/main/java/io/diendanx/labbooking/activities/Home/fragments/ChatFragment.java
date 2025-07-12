@@ -51,7 +51,6 @@ public class ChatFragment extends Fragment {
     private boolean isLastPage = false;
     private static final int PAGE_SIZE = 20;
     private ListenerRegistration listenerRegistration;
-    private RelativeLayout layout;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -314,7 +313,6 @@ public class ChatFragment extends Fragment {
         editTextMessage = view.findViewById(R.id.edt_message);
         sendButton = view.findViewById(R.id.message_send_btn);
         recyclerView = view.findViewById(R.id.chatContent);
-        layout = view.findViewById(R.id.main);
     }
 
     @Override

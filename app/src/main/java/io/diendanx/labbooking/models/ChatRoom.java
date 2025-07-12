@@ -1,11 +1,13 @@
 package io.diendanx.labbooking.models;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.List;
 
 public class ChatRoom {
     String chatRoomId;
+    @ServerTimestamp
     Timestamp lastMessageTimestamp;
     String lastMessageSenderId;
     String lastMessage;

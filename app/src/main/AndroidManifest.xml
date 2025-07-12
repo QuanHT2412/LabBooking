@@ -38,6 +38,8 @@
         <activity
             android:name=".activities.OrderConfirmation.OrderConfirmationActivity"
             android:exported="false" />
+        <activity android:name=".activities.Order.OrderListActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.Register.RegisterActivity"
             android:exported="false" />
