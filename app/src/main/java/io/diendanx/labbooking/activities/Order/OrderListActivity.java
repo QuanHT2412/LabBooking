@@ -1,7 +1,6 @@
 package io.diendanx.labbooking.activities.Order;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -57,22 +56,21 @@ public class OrderListActivity extends AppCompatActivity {
         loadOrders();
     }
 
+    // Loads orders for the current user
     private void loadOrders() {
         if (user == null) {
-            Log.d(TAG, "User is null");
             showEmptyState();
             return;
         }
         String mail = user.getEmail();
-        Log.d(TAG, "Loading orders for email: " + mail);
 
         db.collection("order")
                 .whereEqualTo("email", mail)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         QuerySnapshot querySnapshot = task.getResult();
-                        Log.d(TAG, "Orders found: " + querySnapshot.size());
 
                         if (!querySnapshot.isEmpty()) {
                             orderList.clear();
@@ -82,23 +80,20 @@ public class OrderListActivity extends AppCompatActivity {
                                 Order order = doc.toObject(Order.class);
                                 order.setId(doc.getId());
                                 loadedOrders.add(order);
-                                Log.d(TAG, "Order loaded: " + order.getId() + ", User: " + order.getUsername());
-                                Log.d(TAG, "Order items IDs: " + order.getOrderItems());
                             }
 
                             orderList.addAll(loadedOrders);
                             loadOrderItemsForOrders(loadedOrders);
                         } else {
-                            Log.d(TAG, "No orders found");
                             showEmptyState();
                         }
                     } else {
-                        Log.e(TAG, "Error loading orders", task.getException());
                         showEmptyState();
                     }
                 });
     }
 
+    // Loads order items for the given orders
     private void loadOrderItemsForOrders(List<Order> orders) {
         List<String> allOrderItemIds = new ArrayList<>();
 
@@ -106,19 +101,15 @@ public class OrderListActivity extends AppCompatActivity {
         for (Order order : orders) {
             if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
                 allOrderItemIds.addAll(order.getOrderItems());
-                Log.d(TAG, "Added order item IDs from order " + order.getId() + ": " + order.getOrderItems());
             }
         }
 
         if (allOrderItemIds.isEmpty()) {
-            Log.d(TAG, "No order item IDs found in orders");
             updateUI();
             return;
         }
 
-        Log.d(TAG, "Looking for order items with IDs: " + allOrderItemIds);
-
-        // Now search for these order items in the order_item collection
+        // Search for these order items in the order_item collection
         db.collection("order_item")
                 .whereIn("id", allOrderItemIds)
                 .get()
@@ -127,33 +118,28 @@ public class OrderListActivity extends AppCompatActivity {
 
                     if (task.isSuccessful() && task.getResult() != null) {
                         QuerySnapshot querySnapshot = task.getResult();
-                        Log.d(TAG, "Order items found: " + querySnapshot.size());
 
                         for (QueryDocumentSnapshot doc : querySnapshot) {
                             OrderItem item = doc.toObject(OrderItem.class);
                             item.setId(doc.getId());
                             orderItemsList.add(item);
-                            Log.d(TAG, "Order item loaded: " + item.getId() +
-                                    ", Package: " + item.getPackageName());
                         }
 
                         // If still no items found, try using document IDs directly
                         if (querySnapshot.isEmpty()) {
-                            Log.d(TAG, "No items found with 'id' field, trying document IDs...");
                             loadOrderItemsByDocumentIds(allOrderItemIds);
                         } else {
                             updateUI();
                         }
                     } else {
-                        Log.e(TAG, "Error loading order items", task.getException());
                         // Try loading by document IDs as fallback
                         loadOrderItemsByDocumentIds(allOrderItemIds);
                     }
                 });
     }
 
+    // Fallback method to load order items by their document IDs
     private void loadOrderItemsByDocumentIds(List<String> orderItemIds) {
-        Log.d(TAG, "Trying to load order items by document IDs");
         orderItemsList.clear();
 
         // Load each order item by its document ID
@@ -167,17 +153,11 @@ public class OrderListActivity extends AppCompatActivity {
                             if (item != null) {
                                 item.setId(documentSnapshot.getId());
                                 orderItemsList.add(item);
-                                Log.d(TAG, "Order item loaded by document ID: " + item.getId() +
-                                        ", Package: " + item.getPackageName());
                             }
-                        } else {
-                            Log.d(TAG, "No document found with ID: " + itemId);
                         }
-
                         updateUI();
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Error loading order item by ID: " + itemId, e);
                         updateUI();
                     });
         }
@@ -188,9 +168,8 @@ public class OrderListActivity extends AppCompatActivity {
         }
     }
 
+    // Updates the UI with current order data
     private void updateUI() {
-        Log.d(TAG, "Updating UI - Orders: " + orderList.size() + ", Items: " + orderItemsList.size());
-
         adapter.setOrderItems(orderItemsList);
         adapter.notifyDataSetChanged();
 
@@ -202,6 +181,7 @@ public class OrderListActivity extends AppCompatActivity {
         }
     }
 
+    // Shows empty state when no orders are available
     private void showEmptyState() {
         recyclerViewOrders.setVisibility(View.GONE);
         emptyStateLayout.setVisibility(View.VISIBLE);

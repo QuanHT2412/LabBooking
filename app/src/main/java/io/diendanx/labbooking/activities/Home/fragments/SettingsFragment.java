@@ -60,8 +60,7 @@ public class SettingsFragment extends Fragment {
         tvUsername = v.findViewById(R.id.tv_username);
         tvName = v.findViewById(R.id.tv_name);
         mAuth = FirebaseAuth.getInstance();
-        tvUsername = v.findViewById(R.id.tv_username);
-        tvEmail = v.findViewById(R.id.tv_email);
+
     }
 
     private void setUserInfo() {

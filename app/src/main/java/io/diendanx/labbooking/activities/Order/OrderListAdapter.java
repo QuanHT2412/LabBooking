@@ -1,6 +1,5 @@
 package io.diendanx.labbooking.activities.Order;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,32 +49,27 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         return new OrderViewHolder(v);
     }
 
+    // Binds order data to the view holder
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
         Order order = orderList.get(position);
 
-        // Set basic order information
         holder.tvUserName.setText("User: " + (order.getUsername() != null ? order.getUsername() : "N/A"));
         holder.tvOrderMail.setText("Email: " + (order.getEmail() != null ? order.getEmail() : "N/A"));
         holder.tvOrderDate.setText("Date: " + formatDate(order.getCreated_at()));
         holder.tvOrderPrice.setText("Total: " + formatPrice(order.getTotalPrice()));
 
-        // Show order items for this order
         if (order.getOrderItems() != null) {
             for (String orderItemId : order.getOrderItems()) {
                 for (OrderItem item : orderItems) {
                     if (item.getId() != null && item.getId().equals(orderItemId)) {
-                        // Build the basic item info first
                         StringBuilder itemInfo = new StringBuilder();
                         itemInfo.append("📦 Package: ").append(item.getPackageName() != null ? item.getPackageName() : "N/A").append("\n");
                         itemInfo.append("⏱️ Duration: ").append(formatDuration(item.getDuration())).append("\n");
                         itemInfo.append("📅 Start: ").append(formatDate(item.getStartDate())).append("\n");
                         itemInfo.append("🔧 Add-ons: ");
 
-                        // Set the basic info first, then load facilities
                         holder.tvOrderItems.setText(itemInfo.toString() + "Loading...");
-
-                        // Load facility names
                         loadFacilityNames(item.getSelectedFacilities(), holder.tvOrderItems, itemInfo.toString());
                         break;
                     }
@@ -86,6 +80,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         }
     }
 
+    // Loads facility names from IDs and updates the target view
     private void loadFacilityNames(List<String> facilityIds, TextView targetView, String baseText) {
         if (facilityIds == null || facilityIds.isEmpty()) {
             targetView.setText(baseText + "None");
@@ -101,12 +96,10 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
             return;
         }
 
-        // These are IDs, need to fetch names
         List<String> facilityNames = new ArrayList<>();
         AtomicInteger completedRequests = new AtomicInteger(0);
 
         for (String facilityId : facilityIds) {
-            // Direct check for whiteboard ID first
             if ("YjIgSE2hfyxYflcGlnPs".equals(facilityId) || "Yjig5E2hfyxYfIcGInPs".equals(facilityId.trim())) {
                 facilityNames.add("Whiteboard");
                 if (completedRequests.incrementAndGet() == facilityIds.size()) {
@@ -115,7 +108,6 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
                 continue;
             }
 
-            // Also check with the helper method for variations
             if (isWhiteboardId(facilityId)) {
                 facilityNames.add("Whiteboard");
                 if (completedRequests.incrementAndGet() == facilityIds.size()) {
@@ -124,7 +116,6 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
                 continue;
             }
 
-            // Check cache first
             if (facilityNameCache.containsKey(facilityId)) {
                 String cachedName = facilityNameCache.get(facilityId);
                 facilityNames.add(cachedName);
@@ -133,7 +124,6 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
                     targetView.setText(baseText + String.join(", ", facilityNames));
                 }
             } else {
-                // Fetch from Firestore
                 db.collection("facility").document(facilityId)
                         .get()
                         .addOnSuccessListener(documentSnapshot -> {
@@ -149,11 +139,9 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
                                 facilityName = "Unknown Facility";
                             }
 
-                            // Cache the result
                             facilityNameCache.put(facilityId, facilityName);
                             facilityNames.add(facilityName);
 
-                            // Update UI when all facilities are loaded
                             if (completedRequests.incrementAndGet() == facilityIds.size()) {
                                 targetView.setText(baseText + String.join(", ", facilityNames));
                             }
@@ -169,6 +157,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         }
     }
 
+    // Checks if the given ID is a known whiteboard ID
     private boolean isWhiteboardId(String facilityId) {
         if (facilityId == null) return false;
 
@@ -188,25 +177,21 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         return false;
     }
 
+    // Formats duration from minutes to a human-readable string (hours/days)
     private String formatDuration(int duration) {
-        // Handle edge cases
         if (duration <= 0) {
             return "Invalid duration";
         }
 
         // Convert from stored value to actual hours
-        // If 60 stored = 1 hour, divide by 60
-        // If 1440 stored = 1 day, divide by 1440
         int actualHours;
 
         if (duration >= 1440) {
             // 1 day = 1440 minutes
             actualHours = duration / 60; // Convert minutes to hours
         } else if (duration == 60) {
-            // 1 hour = 60 minutes
             actualHours = 1;
         } else if (duration > 60 && duration < 1440) {
-            // Calculate hours for values between 60 and 1440
             actualHours = duration / 60;
         } else {
             // For small values, assume it's already in hours
@@ -214,14 +199,14 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         }
 
         if (actualHours < 24) {
-            // Less than 24 hours - show as hours
+            // Show as hours
             return actualHours + " hour" + (actualHours != 1 ? "s" : "");
         } else if (actualHours % 24 == 0) {
-            // Exact days - show as days
+            // Show as days
             int days = actualHours / 24;
             return days + " day" + (days != 1 ? "s" : "");
         } else {
-            // Mixed days and hours
+            // Show as days and hours
             int days = actualHours / 24;
             int hours = actualHours % 24;
             return days + " day" + (days != 1 ? "s" : "") +
@@ -229,6 +214,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         }
     }
 
+    // Formats a Firestore timestamp to a readable date string
     private String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "N/A";
         try {
@@ -240,6 +226,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         }
     }
 
+    // Formats a price with thousand separators
     private String formatPrice(long price) {
         return String.format(Locale.getDefault(), "%,d", price);
     }
