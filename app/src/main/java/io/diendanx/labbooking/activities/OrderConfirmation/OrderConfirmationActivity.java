@@ -288,9 +288,16 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         tvHeader3.setPadding(0, 0, 16, 0);
         tvHeader3.setTextColor(ContextCompat.getColor(context, R.color.main_900));
         tvHeader3.setTypeface(tvHeader3.getTypeface(), android.graphics.Typeface.BOLD);
+        // Duration
+        TextView tvHeader4 = new TextView(context);
+        tvHeader4.setText("Duration");
+        tvHeader4.setPadding(0, 0, 16, 0);
+        tvHeader4.setTextColor(ContextCompat.getColor(context, R.color.main_900));
+        tvHeader4.setTypeface(tvHeader4.getTypeface(), android.graphics.Typeface.BOLD);
         headerRow.addView(tvHeader1);
         headerRow.addView(tvHeader2);
         headerRow.addView(tvHeader3);
+        headerRow.addView(tvHeader4);
         tableOrderSummary.addView(headerRow);
 
         long totalPrice = 0;
@@ -298,7 +305,8 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         for (Cart cart : items) {
             String packageName = "";
             String date = "-";
-            String timeRange = "-";
+            String startTime = "-";
+            String durationStr = "-";
             int iconRes = R.drawable.ic_package;
             if (cart.getStartDate() != null && cart.getDuration() > 0) {
                 java.util.Date start = cart.getStartDate().toDate();
@@ -307,10 +315,8 @@ public class OrderConfirmationActivity extends AppCompatActivity {
                 date = dateFormat.format(start);
                 java.util.Calendar cal = java.util.Calendar.getInstance();
                 cal.setTime(start);
-                String fromHour = hourFormat.format(start);
-                cal.add(java.util.Calendar.HOUR_OF_DAY, (int) cart.getDuration());
-                String toHour = hourFormat.format(cal.getTime());
-                timeRange = fromHour + " - " + toHour;
+                startTime = hourFormat.format(cal.getTime());
+                durationStr = String.format("%.2f", (double)cart.getDuration()/60);
             }
             for (Package pkg : packages) {
                 if (pkg.getId().equals(cart.getPackageId())) {
@@ -345,13 +351,20 @@ public class OrderConfirmationActivity extends AppCompatActivity {
             tvDate.setTextColor(ContextCompat.getColor(context, R.color.main_700));
             tvDate.setTextSize(15);
             row.addView(tvDate);
-            // Time
+            // Start Time
             TextView tvTime = new TextView(context);
-            tvTime.setText(timeRange);
+            tvTime.setText(startTime);
             tvTime.setPadding(0, 0, 16, 0);
             tvTime.setTextColor(ContextCompat.getColor(context, R.color.main_700));
             tvTime.setTextSize(15);
             row.addView(tvTime);
+            // Duration (hr)
+            TextView tvDuration = new TextView(context);
+            tvDuration.setText(durationStr + " hr");
+            tvDuration.setPadding(0, 0, 16, 0);
+            tvDuration.setTextColor(ContextCompat.getColor(context, R.color.main_700));
+            tvDuration.setTextSize(15);
+            row.addView(tvDuration);
             tableOrderSummary.addView(row);
             totalPrice += cart.getTotalPrice();
             alternate = !alternate;
@@ -367,15 +380,18 @@ public class OrderConfirmationActivity extends AppCompatActivity {
         // Add empty cells for alignment
         TextView emptyCell1 = new TextView(context);
         TextView emptyCell2 = new TextView(context);
+        TextView emptyCell3 = new TextView(context);
         TextView tvTotalValue = new TextView(context);
         tvTotalValue.setText(String.format("%,d VND", totalPrice));
-        tvTotalValue.setPadding(0, 20, 0, 0);
+        tvTotalValue.setPadding(0, 20, 0, 0); // Remove right padding to keep it left-aligned
+        tvTotalValue.setGravity(android.view.Gravity.START);
         tvTotalValue.setTextColor(ContextCompat.getColor(context, R.color.main_900));
         tvTotalValue.setTypeface(tvTotalValue.getTypeface(), android.graphics.Typeface.BOLD);
         tvTotalValue.setTextSize(14); // smaller size for total amount
         totalRow.addView(tvTotalLabel);
         totalRow.addView(emptyCell1);
         totalRow.addView(emptyCell2);
+        totalRow.addView(emptyCell3);
         totalRow.addView(tvTotalValue);
         tableOrderSummary.addView(totalRow);
     }
